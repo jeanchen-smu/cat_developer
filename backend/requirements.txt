@@ -8,4 +8,5 @@ PyYAML==3.12
 requests==2.12.4
 requests-aws4auth==0.9
 pytz==2016.10
+flask-jwt-extended==2.2.0
 

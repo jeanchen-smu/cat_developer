@@ -1,17 +1,24 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
+from flask_jwt_extended import JWTManager, jwt_required,\
+    create_access_token, get_jwt_identity
 
 app = Flask(__name__)
+app.secret_key = "JWT SECRET"
+
+jwt = JWTManager(app)
 
 @app.route("/login", methods=["POST"])
 def login():
-    status = "FAIL"
-    if request.method=="POST":
-        username=request.form["username"]
-        password=request.form["password"]
-        status="OK"
-    return jsonify(status=status)
+    username = request.json.get('username')
+    password = request.json.get('password')
 
-@app.route("/rank", methods=["GET", "POST"])
+    if username != 'goldbell' and password != '1234':
+        return jsonify(msg="Bad username or password"), 401
+    token = create_access_token(username)
+    return jsonify(access_token=token), 200
+
+@app.route("/rank", methods=["GET"])
+@jwt_required
 def get_vehicle_ranks():
     header_fields = [
         "Rank",
