@@ -26,7 +26,7 @@ class Header extends React.Component {
 
     logOut(){
         localStorage.removeItem("token");
-		browserHistory.push("/login");;
+		browserHistory.push("/login");
     }
 
 	getLeftMenu() {

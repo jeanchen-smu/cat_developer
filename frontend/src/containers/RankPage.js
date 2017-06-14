@@ -3,9 +3,6 @@ import PageBase from "../components/PageBase";
 import FilterDrawer, { FilterObj } from "../components/filter/FilterDrawer";
 import RankTable from "../components/ranking/RankTable";
 import axios from "axios";
-//import $ from "jquery";
-
-//import Data from "../data";
 
 class RankPage extends React.Component {
 	constructor() {
@@ -26,12 +23,19 @@ class RankPage extends React.Component {
 		this.refreshRankingData();
 	}
 
+	getRankingReqObj(){
+		return {
+            method: "get",
+            url: "/api/rank",
+			headers:{
+				Authorization: "Bearer " + localStorage.getItem("access_token")            
+			}
+        };
+	}
+
 	refreshRankingData() {
-		axios
-			.get("/api/rank", {
-				Accept: "application/json",
-				"Content-Type": "application/json"
-			})
+		var reqObj = this.getRankingReqObj();
+		axios(reqObj)
 			.then(resp => {
 				this.setState({ rankingData: resp.data });
 			})

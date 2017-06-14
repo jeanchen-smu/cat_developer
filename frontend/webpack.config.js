@@ -13,7 +13,7 @@ var config = {
   ],
   target: 'web',
   output: {
-    path: 'C:\\Users\\aisavenu\\Desktop\\Projects\\Goldbell\\nginx-1.12.0\\\html\\',
+    path: '/usr/local/Cellar/nginx/1.12.0_1/html/',
     publicPath: '/',
     filename: 'bundle.js'
   },

@@ -12,11 +12,12 @@ def login():
     username = request.json.get('username')
     password = request.json.get('password')
 
-    if username != 'goldbell' and password != '1234':
-        return jsonify(msg="Bad username or password"), 401
-    token = create_access_token(username)
-    return jsonify(access_token=token), 200
-
+    if username == 'goldbell' and password == '1234':
+        token = create_access_token(username)
+        return jsonify(access_token=token, msg="Success"), 200
+    
+    return jsonify(access_token="", msg="Bad username or password"), 401
+    
 @app.route("/rank", methods=["GET"])
 @jwt_required
 def get_vehicle_ranks():

@@ -34,7 +34,8 @@
     "react-tap-event-plugin": "2.0.1",
     "recharts": "0.20.8",
     "leaflet":"1.0.3",
-    "react-leaflet":"1.2.2"
+    "react-leaflet":"1.2.2",
+    "axios":"0.16.2"
   },
   "devDependencies": {
     "autoprefixer": "6.7.3",

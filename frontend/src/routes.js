@@ -10,7 +10,7 @@ import RankPage from "./containers/RankPage";
 import TrackingPage from "./containers/TrackingPage";
 
 function loggedIn() {
-	return localStorage.getItem("token") != null;
+	return localStorage.getItem("access_token") != null;
 }
 
 function requireAuth(nextState, replace) {
