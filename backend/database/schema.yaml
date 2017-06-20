@@ -30,6 +30,7 @@ VEHICLE:
       - RoadType: keyword
       - SpeedLimit: float
       - OverSpeed: float
+      #- State: object
       - DeviceTS: date #timestamp of the last data pull
       
 POSITION:
@@ -40,11 +41,18 @@ POSITION:
       - Pos: geo_point
       - Speed: float
       - Direction: float
+      - State: object
+      - Events: object
       - RoadName: keyword
       - RoadType: keyword
       - SpeedLimit: float
       - OverSpeed: float
 
+EVENT:
+      - VehicleID: integer 
+      - DeviceTS: date
+      - Events: object
+       
 VEHICLE_SCORE:
       - Date: date
       - VehicleID: integer

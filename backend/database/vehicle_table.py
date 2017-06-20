@@ -6,7 +6,7 @@ class VehicleTable(BaseTable):
         BaseTable.__init__(self, 'VEHICLE')
         self.tz_help = TimeHelper()
 
-    def insert_vehicle(self, **vehicle):
+    def upsert_vehicle(self, **vehicle):
         doc = {
             'VehicleID': vehicle['id'],
             'RegistrationNo': vehicle['registration_code'],
@@ -15,21 +15,20 @@ class VehicleTable(BaseTable):
             'OwnerName': vehicle['park_info']['enterprise_info']['name'],
             'LinkedToAccount': 'Y',
             'APIAccessCode': vehicle['api_access_code'],
-            'PartnerName': vehicle['partner_name']
+            'PartnerName': vehicle['partner_name'],
+            'Lat': vehicle['position']['lat'],
+            'Lon': vehicle['position']['lon'],
+            'Pos': {"lat": vehicle['position']['lat'], "lon": vehicle['position']['lon']},
+            'Speed': vehicle['position']['speed'],
+            'Direction': vehicle['position']['bearing'],
+            'RoadName': vehicle['position']['road_name'],
+            'RoadType': vehicle['position']['road_type'],
+            'SpeedLimit': vehicle['position']['speed_limit'],
+            'OverSpeed': vehicle['position']['over_speed'],
+            # 'State': {
+            #     'IgnitionStatus': 'ON' if vehicle['inputs']['engine_on'] else 'OFF',
+            #     'BatteryVolt': vehicle['inputs']['power_voltage'],
+            # },
+            'DeviceTS': self.tz_help.convert_local(vehicle['position']['device_ts'])
         }
         BaseTable.insert(self, vehicle['id'], doc)
-
-    def update_latest_position(self, **pos):
-        doc = {
-            'Lat': pos['lat'],
-            'Lon': pos['lon'],
-            'Pos': {"lat": pos['lat'], "lon": pos['lon']},
-            'Speed': pos['speed'],
-            'Direction': pos['bearing'],
-            'RoadName': pos['road_name'],
-            'RoadType': pos['road_type'],
-            'SpeedLimit': pos['speed_limit'],
-            'OverSpeed': pos['over_speed'],
-            'DeviceTS': self.tz_help.convert_local(pos['device_ts'])
-        }
-        BaseTable.update(self, pos['vehicle_id'], doc)

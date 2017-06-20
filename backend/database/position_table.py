@@ -18,6 +18,8 @@ class PositionTable(BaseTable):
             'Pos': {"lat": pos['lat'], "lon": pos['lon']},
             'Speed': pos['speed'],
             'Direction': pos['bearing'],
+            'State': pos['state'],
+            'Events': pos['events'],
             'RoadName': pos['road_name'],
             'RoadType': pos['road_type'],
             'SpeedLimit': pos['speed_limit'],

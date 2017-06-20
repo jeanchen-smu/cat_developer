@@ -1,55 +1,105 @@
-import boto3
-from config.config_helper import ConfigHelper
+from database.position_table import PositionTable
 from database.vehicle_table import VehicleTable
-import lambda_position
-from datetime import datetime, timedelta
-from dateutil.parser import parse
+from database.event_table import EventTable
+from provider.data_helper import Baseride
+from helper.enrich_helper import EnrichHelper
 from utils.time_helper import TimeHelper
-import json
 
 
 class PositionDownloader:
     def __init__(self):
+        self.position_table = PositionTable()
         self.vehicle_table = VehicleTable()
-        lambda_params = ConfigHelper().get_lambda_params()
-        self.aws_lambda = boto3.client(
-            'lambda',
-            aws_access_key_id=lambda_params['AccessKeyID'],
-            aws_secret_access_key=lambda_params['AccessKey'],
-            region_name=lambda_params['Region']
-        )
-        self.tz_help = TimeHelper()
-
-    def _prepare_lambda_args(self, vehicle):
-        lambda_args = {}
-        if vehicle.has_key('DeviceTS'):
-            last_device_ts = self.tz_help.convert_utc(vehicle['DeviceTS'])
+        self.event_table = EventTable()
+        self.baseride = Baseride()
+        self.enricher = EnrichHelper()
+        self.time_help = TimeHelper()
+        
+    def _enrich(self, pos):
+        if pos['speed'] == 0:  # don't enrich 0 speed points
+            pos.update({'road_name': 'NA', 'road_type': 'NA',
+                        'speed_limit': 0, 'over_speed': 0})
         else:
-            # first time when a vehicle is appearing
-            last_device_ts = self.tz_help.utc_now(minus_seconds=30)
+            resp = self.enricher.enrich_position(pos['lat'], pos['lon'])
+            # compute overspeeding
+            resp['over_speed'] = 0
+            if resp['speed_limit'] != 0:
+                resp['over_speed'] = pos['speed'] - resp['speed_limit']
+            pos.update(resp)
 
-        lambda_args['VehicleID'] = vehicle['VehicleID']
-        lambda_args['DeviceTS'] = last_device_ts
-        lambda_args['APIAccessCode'] = vehicle['APIAccessCode']
-        return lambda_args
+    def _get_state(self, args, states):
+        for state in self.baseride.get_state(**args):
+            try:
+                if state['inputs'].has_key('analog'): #new device
+                    battery_volt = float(state['inputs']['analog']['1']) * 0.1176470588235
+                    ignition_status = 'ON' if state['inputs']['logical']['io_status']['ignition_port'] else 'OFF'
+                else: #old 3g device
+                    battery_volt = None
+                    if state['inputs'].has_key('power_voltage'):
+                        battery_volt = float(state['inputs']['power_voltage'])
+                    ignition_status = 'ON' if state['inputs']['engine_on'] else 'OFF'
 
-    def start(self, use_lambda=False):
+                states[state['device_ts']] = {
+                    'BatteryVolt': battery_volt,
+                    'IgnitionStatus': ignition_status
+                }
+            except Exception as e:
+                print 'Exception - _get_state', e
+
+    def _get_event(self, args, events):
+        for event in self.baseride.get_event(**args):
+            try:
+                if not events.has_key(event['device_ts']):
+                    events[event['device_ts']] = []
+                events[event['device_ts']].append(event['events'])
+            except:
+                print 'Exception - _get_event', e
+    
+    def _fetch_position(self, args):
+        states, events = {}, {}
+        # get data from state & events api
+        self._get_state(args, states)
+        self._get_event(args, events)
+
+        #insert events -- for testing to see any event timestamp that doesn't have
+        #a corresponding position time stamp
+        for device_ts, event_list in events.iteritems():
+            self.event_table.insert_event(args['vehicle_id'], device_ts, event_list)
+
+        # get data from position api
+        for pos in self.baseride.get_position(**args):
+            # enrich with road name, speed limit etc.
+            self._enrich(pos)
+            # merge with state & events
+            pos['state'] = None
+            if states.has_key(pos['device_ts']):
+                pos['state'] = states[pos['device_ts']]
+
+            pos['events'] = None
+            if events.has_key(pos['device_ts']):
+                pos['events'] = events[pos['device_ts']]
+           
+            # insert to position table
+            self.position_table.insert_position(**pos)
+
+    def start(self, start_ts, end_ts, max_vehicles):
+        #convert to utc time
+        start_ts_utc = self.time_help.convert_utc(start_ts)
+        end_ts_utc = self.time_help.convert_utc(end_ts)
+
         # for each active vehicle from VEHICLES table,
-        # get the raw position data
-        for vehicle in self.vehicle_table.select_all():
+        # get the position data
+        for index, vehicle in enumerate(self.vehicle_table.select_all()):
             if vehicle['LinkedToAccount'] == 'N':
                 continue
-
+                
+            if max_vehicles and index > max_vehicles:  # for testing purpose, to limit the download
+                break
             print 'Fetching position data for vehicle {}'.format(vehicle['VehicleID'])
 
-            # prepare arguments to lambda function
-            lambda_args = self._prepare_lambda_args(vehicle)
-
-            if use_lambda:
-                response = self.aws_lambda.invoke_async(
-                    FunctionName='fetch_position',
-                    InvokeArgs=json.dumps(lambda_args)
-                )
-                # add logging
-            else:
-                lambda_position.fetch_position(lambda_args, None)
+            args = {}
+            args['vehicle_id'] = vehicle['VehicleID']
+            args['start_ts'] = start_ts_utc
+            args['end_ts'] = end_ts_utc
+            args['access_code'] = vehicle['APIAccessCode']
+            self._fetch_position(args)

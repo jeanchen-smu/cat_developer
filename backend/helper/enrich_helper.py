@@ -31,7 +31,7 @@ class EnrichHelper:
     def enrich_position(self, lat, lon):
         # validate input coordinates
         if (not 0 < lat <= 90) or (not 100 < lon <= 180):
-            return jsonify(**self.error_result)
+            return self.bad_result
 
         # query database
         try:

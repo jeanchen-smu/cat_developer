@@ -9,6 +9,7 @@ class TimeHelper:
         self.utc_tz = pytz.utc
         self.DT_UTC_FORMAT = '%Y-%m-%dT%H:%M:%S.%fZ'
         self.DT_LZ_FORMAT = '%Y-%m-%dT%H:%M:%S.%f+08:00'
+        self.D_UTC_FORMAT = '%Y-%m-%d'
         self.D_LZ_FORMAT = '%Y-%m-%d'
 
     def convert_local(self, utc_time):
@@ -35,6 +36,12 @@ class TimeHelper:
             return datetime.today().strftime(self.D_LZ_FORMAT)
         return (datetime.today() - timedelta(minus_days))\
             .strftime(self.D_LZ_FORMAT)
+    
+    def utc_today(self, minus_days=0):
+        if minus_days == 0:
+            return datetime.utcnow().strftime(self.D_UTC_FORMAT)
+        return (datetime.utcnow() - timedelta(minus_days))\
+            .strftime(self.D_UTC_FORMAT)    
 
     def date_range(self, start_ts, end_ts):
         for day in range((end_ts - start_ts).days + 1):
