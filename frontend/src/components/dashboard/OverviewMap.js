@@ -1,6 +1,6 @@
 
 import React, {PropTypes} from 'react';
-import {Map, TileLayer, LayersControl, Marker, Popup, FeatureGroup} from 'react-leaflet';
+import {Map, TileLayer, LayersControl, FeatureGroup} from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import HeatmapLayer from 'react-leaflet-heatmap-layer';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
@@ -17,7 +17,9 @@ class OverviewMap extends React.Component {
 			Accept: "application/json",
 			"Content-Type": "application/json",
             params: {
-                filter: this.props.filterObj
+                vehicleList: this.props.filterObj.vehicleList,
+                startDate: this.props.filterObj.startDate,
+                endDate: this.props.filterObj.endDate
             }
 		})
         .then((resp) =>{
@@ -33,14 +35,14 @@ class OverviewMap extends React.Component {
 
     render() {
         const singapore = [1.36716,103.80921];
-        const gradient = {
-            0.1: '#89BDE0', 0.2: '#96E3E6', 0.3: '#82CEB6',
-            0.5: '#FAF3A5', 0.8: '#F5D98B', '1.0': '#DE9A96'
-        };
+        
         let markers = [];
         const coordinates = this.state.coordinates;
         for (let i = 0; i < coordinates.length; i++) {
-            markers.push({lat: coordinates[i][0], lng: coordinates[i][1], popup: 'speed: ' + coordinates[i][2]});
+            markers.push({
+                lat: coordinates[i][0], 
+                lng: coordinates[i][1], 
+                popup: 'Vehicle ID: ' + coordinates[i][3] + ' Speed: ' + coordinates[i][2]});
         }
         console.log(markers);
         

@@ -13,7 +13,7 @@ class GeoVisualization extends React.Component {
                     showExpandableButton={true}
                 />
                 <CardText expandable={true}>
-                    <OverviewMap />
+                    <OverviewMap filterObj = {this.props.filterObj}/>
                 </CardText>
             </Card>
         );
