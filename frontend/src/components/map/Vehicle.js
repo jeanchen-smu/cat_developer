@@ -1,4 +1,4 @@
-import React from "react";
+import React, {PropTypes} from "react";
 import { Marker, Popup, CircleMarker } from "react-leaflet";
 
 class Vehicle extends React.Component {
@@ -29,5 +29,14 @@ class Vehicle extends React.Component {
 		);
 	}
 }
+
+Vehicle.propTypes = {
+	latitude: PropTypes.number,
+	longitude: PropTypes.number,
+	overspeed: PropTypes.number,
+	vehicleId: PropTypes.string,
+	timeStamp: PropTypes.string,
+	speed: PropTypes.number
+};
 
 export default Vehicle;
