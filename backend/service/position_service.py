@@ -77,3 +77,21 @@ class PositionService(PositionTable):
             position_result.append(rec)
 
         return position_result
+    
+    def select_vehicle_position(self, date, vehicle):
+        position_result = []
+
+        date_filter = Q('range', DeviceTS={'from': date, 'to':date})
+        vehicle_filter = Q('term', VehicleID=vehicle)
+        position_query = Q("constant_score", filter=date_filter+vehicle_filter)
+        position_response = self.get_response(position_query)
+
+        position_unsorted = []
+        for rec in position_response:
+            position = [str(rec['Pos']['lat']),  str(rec['Pos']['lon']), rec['OverSpeed'], 
+                        str(rec['Speed']), str(rec['DeviceTS'])]
+            position_unsorted.append(position)
+        
+        position_result = sorted(position_unsorted, key=lambda x: x[4])
+        return position_result
+        

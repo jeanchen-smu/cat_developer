@@ -8,29 +8,23 @@ class Historical extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			tripData: [] //array of [vehicleID, coordinates]
+			tripData: [] //array of [vehicleID, positions]
 		};
-		axios
-			.get("/api/historical", {
-				Accept: "application/json",
-				"Content-Type": "application/json"
-			})
-			.then(resp => {
-				this.setState({ tripData: resp.data });
-			})
-			.catch(err => {
-				this.setState({ tripData: [] });
-				alert("Fetch error in Historical: " + err);
-			});
 	}
 
 	componentWillMount() {
 		axios
 			.get("/api/historical", {
 				Accept: "application/json",
-				"Content-Type": "application/json"
+				"Content-Type": "application/json",
+				params: {
+					vehicleList: this.props.filterObj.vehicleList,
+					startDate: this.props.filterObj.startDate,
+					endDate: this.props.filterObj.endDate
+				}
 			})
 			.then(resp => {
+				console.log(resp.data)
 				this.setState({ tripData: resp.data });
 			})
 			.catch(err => {
@@ -40,10 +34,10 @@ class Historical extends React.Component {
 	}
 
 	render() {
-		let routes = this.state.tripData.slice(0, 1);
+		{/*let routes = this.state.tripData.slice(0, 1);*/}
 		return (
 			<div>
-				<RouteMap routes={routes} />
+				<RouteMap routes={this.state.tripData} />
 			</div>
 		);
 	}

@@ -10,7 +10,6 @@ class Realtime extends React.Component {
 		this.state = {
 			data: []
 		};
-		
 	}
 
 	componentWillMount() {
@@ -18,7 +17,7 @@ class Realtime extends React.Component {
 	}
 
 	componentDidMount() {
-		this.timerID = setInterval(this.updateData.bind(this), 30000);
+		this.timerID = setInterval(this.updateData.bind(this), 60*1000);
 	}
 
 	componentWillUnmount(){
@@ -29,15 +28,17 @@ class Realtime extends React.Component {
 		axios
 			.get("/api/realtime", {
 				Accept: "application/json",
-				"Content-Type": "application/json"
+				"Content-Type": "application/json",
+				params: {
+					vehicleList: this.props.vehicleList
+				}
 			})
 			.then(resp => {
-				console.log(resp.data);
 				this.setState({ data: resp.data });
 			})
 			.catch(err => {
 				this.setState({ data: [] });
-				alert("Fetch error in Realtime: " + err);
+				alert("Fetch error: " + err);
 			});
 	}
 
