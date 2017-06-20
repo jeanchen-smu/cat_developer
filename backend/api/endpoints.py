@@ -1,11 +1,16 @@
 from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager, jwt_required,\
     create_access_token, get_jwt_identity
+from service.vehicle_service import VehicleService
+from service.position_service import PositionService
 
 app = Flask(__name__)
 app.secret_key = "JWT SECRET"
 
 jwt = JWTManager(app)
+
+vs = VehicleService()
+ps = PositionService()
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -43,26 +48,36 @@ def get_vehicle_ranks():
 
 @app.route('/realtime', methods=['GET', 'POST'])
 def get_realtime_location():
-    data = [
-        ['30261', '35444', '103.90197', '1.33296', '4', '11:23:30', 0], 
-        ['30608', '35442', '103.67601', '1.32753', '1', '10:10:31', 0], 
-        ['30585', '35441', '103.77096', '1.38375', '1', '11:18:04', 0]
-    ]
+    #vehicleList = request.args.get('vehicleList')
+    vehicle_list = [29696, 29705, 29704, 35114, 34758, 34966]
+
+    data = vs.select_latest_position(vehicle_list)
     return jsonify(data)
 
 @app.route('/historical', methods=['GET', 'POST'])
 def get_past_journeys():
-    data = [
-            ["35444", [
-              [1.38368, 103.73796, '72', '00:00:13'], 
-              [1.38963, 103.74646, '73', '00:01:13'], 
-              [1.38885, 103.75676999999999, '68', '00:02:13'], 
-              [1.39067, 103.76655, '66', '00:03:13'], 
-              [1.39314, 103.77389000000001, '65', '00:04:13'], 
-              [1.40341, 103.77308000000001, '70', '00:05:13'], 
-              [1.41382, 103.77129000000001, '68', '00:06:13'], 
-              [1.42139, 103.77109, '66', '00:07:13'], 
-              [1.4263299999999999, 103.77999, '74', '00:08:13']
-            ]]
-          ]
-    return jsonify(data)		
+    start_date = request.args.get('startDate')
+    end_date = request.args.get('endDate')
+    date = start_date
+    #vehicleList = requeste.args.get('vehicleList')
+    vehicle_list = [34758, 35114, 29705, 29696, 29704, 34966]
+
+    data = []
+    for vehicle in vehicle_list: 
+        data.append([str(vehicle), ps.select_vehicle_position(date,vehicle)])
+
+    return jsonify(data)	
+
+@app.route('/overview', methods=['GET', 'POST'])
+def get_overview_coordinates(): 
+    start_date = request.args.get('startDate')
+    end_date = request.args.get('endDate')
+    date = end_date
+    #vehicle_list = request.args.get('vehicleList')
+    vehicle_list = [29705, 29696, 29704, 34758, 35114, 34966]
+    raw_position_data = ps.select_all_position(date, vehicle_list)
+    data = []
+    for position in raw_position_data:
+        position = [str(position['Lat']), str(position['Lon']), str(position['Speed']), str(position['VehicleID'])]
+        data.append(position)
+    return jsonify(data)	
