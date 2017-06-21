@@ -44,7 +44,11 @@ class OverviewMap extends React.Component {
                 lng: coordinates[i][1], 
                 popup: 'Vehicle ID: ' + coordinates[i][3] + ' Speed: ' + coordinates[i][2]});
         }
-        console.log(markers);
+        
+        const gradient = {
+            0.1: '#89BDE0', 0.2: '#96E3E6', 0.4: '#82CEB6',
+            0.6: '#FAF3A5', 0.8: '#F5D98B', '1.0': '#DE9A96'
+        };
         
         return (
             <div>
@@ -60,6 +64,7 @@ class OverviewMap extends React.Component {
                             <FeatureGroup color="purple">
                             <HeatmapLayer
                                 points={coordinates}
+                                gradient={gradient}
                                 longitudeExtractor={m => m[1]}
                                 latitudeExtractor={m => m[0]}
                                 intensityExtractor={m => parseFloat(m[2])}
