@@ -3,6 +3,7 @@ from flask_jwt_extended import JWTManager, jwt_required,\
     create_access_token, get_jwt_identity
 from service.vehicle_service import VehicleService
 from service.position_service import PositionService
+import pdb
 
 app = Flask(__name__)
 app.secret_key = "JWT SECRET"

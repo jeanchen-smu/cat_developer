@@ -90,6 +90,8 @@ class PositionDownloader:
         # for each active vehicle from VEHICLES table,
         # get the position data
         for index, vehicle in enumerate(self.vehicle_table.select_all()):
+            #if str(vehicle['VehicleID']) != '32368':
+            #    continue
             if vehicle['LinkedToAccount'] == 'N':
                 continue
                 

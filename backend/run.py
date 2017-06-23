@@ -43,7 +43,7 @@ es.indices.refresh(index='_all')
 score_help = VehicleScoreHelper()
 yesterday = datetime.today() - timedelta(1)
 #today = datetime.today()
-score_help.process_score(yesterday, yesterday)
+#score_help.process_score(yesterday, yesterday)
 
 
 
