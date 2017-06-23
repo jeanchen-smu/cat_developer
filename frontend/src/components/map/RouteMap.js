@@ -21,7 +21,7 @@ class RouteMap extends React.Component {
 		}
 
 		return (
-			<Map center={singapore} zoom={12}>
+			<Map center={singapore} zoom={11}>
 				<TileLayer
 					url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
 					attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"

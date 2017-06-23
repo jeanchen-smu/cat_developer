@@ -18,3 +18,14 @@ class VehicleService(VehicleTable):
             position_result.append(position)
 
         return position_result
+
+    def get_all_vehicles(self):
+        vehicle_result = []
+
+        vehicle_query = Q("match_all")
+        vehicle_response = self.get_response(vehicle_query)
+        
+        for rec in vehicle_response:
+            vehicle_result.append(str(rec['VehicleID']))
+        
+        return vehicle_result

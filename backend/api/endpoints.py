@@ -3,6 +3,7 @@ from flask_jwt_extended import JWTManager, jwt_required,\
     create_access_token, get_jwt_identity
 from service.vehicle_service import VehicleService
 from service.position_service import PositionService
+from service.vehicle_score_service import VehicleScoreService
 import pdb
 
 app = Flask(__name__)
@@ -10,8 +11,9 @@ app.secret_key = "JWT SECRET"
 
 jwt = JWTManager(app)
 
-vs = VehicleService()
-ps = PositionService()
+vehicle_service = VehicleService()
+position_service = PositionService()
+vehicle_score_service = VehicleScoreService()
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -24,7 +26,7 @@ def login():
     
     return jsonify(access_token="", msg="Bad username or password"), 401
     
-@app.route("/rank", methods=["GET"])
+@app.route("/rank", methods=["GET", 'POST'])
 @jwt_required
 def get_vehicle_ranks():
     header_fields = [
@@ -36,36 +38,55 @@ def get_vehicle_ranks():
         "Driving Time",
         "Distance"
     ]
-    data = [
-        {"Rank": 1, "Vehicle ID": "36391", "Kind": "truck", "Score": 0.99, "Max Overspeed": 5, "Driving Time": 6.59, "Distance": 246.5},
-        {"Rank": 2, "Vehicle ID": "35281", "Kind": "truck", "Score": 0.89, "Max Overspeed": 10, "Driving Time": 5.50, "Distance": 246.5},
-        {"Rank": 3, "Vehicle ID": "26393", "Kind": "van", "Score": 0.89, "Max Overspeed": 10, "Driving Time": 8.95, "Distance": 346.5},
-        {"Rank": 4, "Vehicle ID": "56391", "Kind": "truck", "Score": 0.79, "Max Overspeed": 15, "Driving Time": 7.50, "Distance": 296.5},
-        {"Rank": 5, "Vehicle ID": "66917", "Kind": "van", "Score": 0.75, "Max Overspeed": 17, "Driving Time": 2.45, "Distance": 46.5},
-        {"Rank": 6, "Vehicle ID": "36312", "Kind": "truck", "Score": 0.73, "Max Overspeed": 18, "Driving Time": 3.95, "Distance": 146.5},
-    ]
+
+    
+    start_date = request.args.get('startDate')
+    end_date = request.args.get('endDate')
+    vehicle_list = request.args.get('vehicleList')
+    
+    #c = 1/0
+
+    print(start_date)
+    if vehicle_list is None:
+        vehicle_list = vehicle_service.get_all_vehicles()
+
+    raw_score_data = vehicle_score_service.select_score_by_date_range(start_date, end_date, vehicle_list)
+    sorted_score_data = sorted(raw_score_data, key=lambda x: x['Score'], reverse=True)
+    
+    data = []
+    for score in sorted_score_data:  
+        data.append({"Rank": sorted_score_data.index(score) + 1, 
+                     "Vehicle ID": str(score['VehicleID']), 
+                     "Kind": "truck", 
+                     "Score": score['Score'], 
+                     "Max Overspeed": score['MaxSpeed'], 
+                     "Driving Time": score['EstimatedDrivingTime'], 
+                     "Distance": score['EstimatedDrivingDistance']})
     
     return jsonify(data)
 
 @app.route('/realtime', methods=['GET', 'POST'])
 def get_realtime_location():
-    #vehicleList = request.args.get('vehicleList')
-    vehicle_list = [29696, 29705, 29704, 35114, 34758, 34966]
+    vehicle_list = request.args.get('vehicleList')
 
-    data = vs.select_latest_position(vehicle_list)
+    if vehicle_list is None:
+        vehicle_list = vehicle_service.get_all_vehicles()
+
+    data = vehicle_service.select_latest_position(vehicle_list)
     return jsonify(data)
 
 @app.route('/historical', methods=['GET', 'POST'])
 def get_past_journeys():
     start_date = request.args.get('startDate')
     end_date = request.args.get('endDate')
-    date = start_date
-    #vehicleList = requeste.args.get('vehicleList')
-    vehicle_list = [34758, 35114, 29705, 29696, 29704, 34966]
+    vehicle_list = request.args.get('vehicleList')
+
+    if vehicle_list is None:
+        vehicle_list = vehicle_service.get_all_vehicles()
 
     data = []
     for vehicle in vehicle_list: 
-        data.append([str(vehicle), ps.select_vehicle_position(date,vehicle)])
+        data.append([str(vehicle), position_service.select_vehicle_position(end_date,vehicle)])
 
     return jsonify(data)	
 
@@ -73,12 +94,14 @@ def get_past_journeys():
 def get_overview_coordinates(): 
     start_date = request.args.get('startDate')
     end_date = request.args.get('endDate')
-    date = end_date
-    #vehicle_list = request.args.get('vehicleList')
-    vehicle_list = [29705, 29696, 29704, 34758, 35114, 34966]
-    raw_position_data = ps.select_all_position(date, vehicle_list)
+    vehicle_list = request.args.get('vehicleList')
+    
+    if vehicle_list is None:
+        vehicle_list = vehicle_service.get_all_vehicles()
+
+    raw_position_data = position_service.select_all_position(end_date, vehicle_list)
     data = []
     for position in raw_position_data:
         position = [str(position['Lat']), str(position['Lon']), str(position['Speed']), str(position['VehicleID'])]
         data.append(position)
-    return jsonify(data)	
+    return jsonify(data)

@@ -29,7 +29,11 @@ class RankPage extends React.Component {
             url: "/api/rank",
 			headers:{
 				Authorization: "Bearer " + localStorage.getItem("access_token")            
-			}
+			}, 
+			params: {
+				startDate: this.state.filterObj.startDate,
+				endDate: this.state.filterObj.endDate
+			}	
         };
 	}
 
