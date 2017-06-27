@@ -4,11 +4,13 @@ from database.event_table import EventTable
 from provider.data_helper import Baseride
 from helper.enrich_helper import EnrichHelper
 from utils.time_helper import TimeHelper
-from multiprocessing import Process
+from threading import Thread
 import time
 
-class DownloadWorker:
+class DownloadWorker(Thread):
     def __init__(self, args):
+        Thread.__init__(self)
+
         self.args = args
         self.position_table = PositionTable()
         self.vehicle_table = VehicleTable()
@@ -88,7 +90,7 @@ class DownloadWorker:
             self.event_table.insert_event(self.args['vehicle_id'], device_ts,
                                           event_list)
     
-    def process_position(self):
+    def  run(self):
         for pos in self.position:
             self._enrich(pos)
             # merge with state & events
@@ -126,7 +128,7 @@ class PositionDownloader:
     def start(self, start_date, end_date, max_vehicles=None):
         # for each active vehicle from VEHICLES table,
         # get the position data
-        workers, max_workers = [], 10
+        workers, max_workers = [], 20
         for index, vehicle in enumerate(self.vehicle_table.select_all()):
             # if the vehicle is not linked to the account, ignore it
             if vehicle['LinkedToAccount'] == 'N':
@@ -137,12 +139,11 @@ class PositionDownloader:
             print 'Fetching position data for vehicle {}'.format(
                 vehicle['VehicleID'])
 
-            # spawn worker processes for parallel  processing
+            # start worker threads for parallel  processing
             args = self._prepare_args(vehicle, start_date, end_date)
             worker = DownloadWorker(args) # create worker object (downloads data)
-            proc = Process(target=worker.process_position) # new process object
-            proc.start() # process data in a new process
-            workers.append(proc)
+            worker.start()
+            workers.append(worker)
 
             # control parallel processing
             while len(workers) > max_workers:

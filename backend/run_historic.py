@@ -16,7 +16,7 @@ position_downloader = PositionDownloader()
 score_helper = VehicleScoreHelper()
 
 
-def _get_date_tuples(start_date, end_date, step=7):
+def _get_date_tuples(start_date, end_date, step=2):
     date_tuples = []
     start = end = start_date
     while start <= end_date:
@@ -40,4 +40,4 @@ if __name__ == '__main__':
     #vehicle_downloader.start()
     #es.indices.refresh(index='_all')
 
-    download_historic_positions(date(2017, 6, 26), date(2017, 6, 26))
+    download_historic_positions(date(2017, 6, 19), date(2017, 6, 26))
