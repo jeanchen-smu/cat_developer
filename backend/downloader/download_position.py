@@ -22,6 +22,8 @@ class DownloadWorker(Thread):
         self._get_position()
         self._get_state()
         self._get_event()
+        print 'position-{}, state-{}, events-{}'.format(
+            len(self.position), len(self.states), len(self.events))
 
     def _get_position(self):
         for pos in self.baseride.get_position(**self.args):
@@ -91,6 +93,7 @@ class DownloadWorker(Thread):
                                           event_list)
     
     def  run(self):
+        print 'Starting vehicle {}'.format(self.args['vehicle_id'])
         for pos in self.position:
             self._enrich(pos)
             # merge with state & events
@@ -104,6 +107,7 @@ class DownloadWorker(Thread):
 
             # insert to position table
             self.position_table.insert_position(**pos)
+        print 'Done vehicle {}'.format(self.args['vehicle_id'])
     
 class PositionDownloader:
     def __init__(self):
@@ -147,6 +151,7 @@ class PositionDownloader:
 
             # control parallel processing
             while len(workers) > max_workers:
+                print 'Len-workers {}'.format(len(workers))
                 for i, worker in enumerate(workers): # remove finished workers
                     if not worker.is_alive():
                         del workers[i]
