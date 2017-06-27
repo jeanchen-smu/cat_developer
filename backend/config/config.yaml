@@ -20,7 +20,7 @@ Dev:
                         Password: start123
         VehicleScore:
                 #Time Interval between each signal recival (seconds)
-                SignalInterval: 15
+                SignalInterval: 30
                 DateFormat: "%Y-%m-%d"
                 StartTime: T00:00:00+00:00
                 EndTime: T23:59:59+00:00
@@ -46,7 +46,7 @@ Prod:
                         Password: start123
         VehicleScore:
                 #Time Interval between each signal recival (seconds)
-                SignalInterval: 15
+                SignalInterval: 30
                 DateFormat: "%Y-%m-%d"
                 StartTime: T00:00:00+00:00
                 EndTime: T23:59:59+00:00

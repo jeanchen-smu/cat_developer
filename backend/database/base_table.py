@@ -49,7 +49,8 @@ class BaseTable:
     def select_all(self):
         for rec in scan(self.es,
                         query={"query": {"match_all": {}}},
-                        index=self.index, doc_type=self.doc_type):
+                        index=self.index, doc_type=self.doc_type,
+                        request_timeout=5*60):
             yield rec['_source']
 
     def export(self, file_name):

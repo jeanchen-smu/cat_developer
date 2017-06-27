@@ -43,6 +43,6 @@ class TimeHelper:
         return (datetime.utcnow() - timedelta(minus_days))\
             .strftime(self.D_UTC_FORMAT)    
 
-    def date_range(self, start_ts, end_ts):
-        for day in range((end_ts - start_ts).days + 1):
-            yield (start_ts + timedelta(day)).date().strftime(self.D_LZ_FORMAT)
+    def date_range(self, start_date, end_date):
+        for day in range((end_date - start_date).days + 1):
+            yield (start_date + timedelta(day)).strftime(self.D_LZ_FORMAT)

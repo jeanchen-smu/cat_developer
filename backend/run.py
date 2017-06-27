@@ -32,7 +32,7 @@ yesterday = tz_help.today(minus_days=1)
 start_ts = yesterday + "T00:00:00.000+08:00"
 end_ts = yesterday + "T23:59:59.999+08:00"
 
-PositionDownloader().start(start_ts, end_ts, 1)
+PositionDownloader().start(start_ts, end_ts, 5)
 es.indices.refresh(index='_all')
 
 ##export data for validation

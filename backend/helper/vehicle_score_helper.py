@@ -60,11 +60,11 @@ class VehicleScoreHelper:
             'Score': 0
         }
 
-    def process_score(self, start_ts, end_ts):
+    def process_score(self, start_date, end_date):
         # for each vehicle_id in VEHICLES table, compute the score
         # for each day of the given date range
         for vehicle in self.vehicle_table.select_all():
-            for date in self.time_help.date_range(start_ts, end_ts):
+            for date in self.time_help.date_range(start_date, end_date):
                 print 'Computing score for {} and date {}'.format(vehicle['VehicleID'], date)
                 vstats = self.position_table.vehicle_stats(vehicle['VehicleID'], date)
 
