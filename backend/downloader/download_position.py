@@ -87,13 +87,12 @@ class DownloadWorker(Thread):
                 resp['over_speed'] = pos['speed'] - resp['speed_limit']
             pos.update(resp)
 
-    def _insert_events(self):
-        for device_ts, event_list in self.events.iteritems():
-            self.event_table.insert_event(self.args['vehicle_id'], device_ts,
-                                          event_list)
-    
     def  run(self):
         print 'Starting vehicle {}'.format(self.args['vehicle_id'])
+        #insert to events tables
+        self.event_table.insert_event_bulk(self.args['vehicle_id'], self.events)
+        
+        #enrich position
         for pos in self.position:
             self._enrich(pos)
             # merge with state & events
@@ -105,12 +104,13 @@ class DownloadWorker(Thread):
             if self.events.has_key(pos['device_ts']):
                 pos['events'] = self.events[pos['device_ts']]
 
-            # insert to position table
-            self.position_table.insert_position(**pos)
+         # insert to position table
+        self.position_table.insert_position_bulk(self.position)
         print 'Done vehicle {}'.format(self.args['vehicle_id'])
     
 class PositionDownloader:
-    def __init__(self):
+    def __init__(self, max_workers=10):
+        self.max_workers = max_workers
         self.vehicle_table = VehicleTable()
         self.time_help = TimeHelper()
 
@@ -132,7 +132,7 @@ class PositionDownloader:
     def start(self, start_date, end_date, max_vehicles=None):
         # for each active vehicle from VEHICLES table,
         # get the position data
-        workers, max_workers = [], 20
+        workers = []
         for index, vehicle in enumerate(self.vehicle_table.select_all()):
             # if the vehicle is not linked to the account, ignore it
             if vehicle['LinkedToAccount'] == 'N':
@@ -150,7 +150,7 @@ class PositionDownloader:
             workers.append(worker)
 
             # control parallel processing
-            while len(workers) > max_workers:
+            while len(workers) > self.max_workers:
                 print 'Len-workers {}'.format(len(workers))
                 for i, worker in enumerate(workers): # remove finished workers
                     if not worker.is_alive():
