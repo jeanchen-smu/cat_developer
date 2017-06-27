@@ -22,7 +22,7 @@ class DownloadWorker(Thread):
         self._get_position()
         self._get_state()
         self._get_event()
-        print 'position-{}, state-{}, events-{}'.format(
+        print 'Position-{}, States-{}, Events-{}'.format(
             len(self.position), len(self.states), len(self.events))
 
     def _get_position(self):
@@ -150,8 +150,8 @@ class PositionDownloader:
             workers.append(worker)
 
             # control parallel processing
-            while len(workers) > self.max_workers:
-                print 'Len-workers {}'.format(len(workers))
+            while len(workers) >= self.max_workers:
+                print 'Max-workers {} reached'.format(len(workers))
                 for i, worker in enumerate(workers): # remove finished workers
                     if not worker.is_alive():
                         del workers[i]
