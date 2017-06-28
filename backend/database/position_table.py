@@ -28,6 +28,31 @@ class PositionTable(BaseTable):
         }
         BaseTable.insert(self, str(pos['vehicle_id']) + pos['device_ts'], doc)
 
+    def insert_position_bulk(self, position):
+        docs = (
+            {
+                '_index': self.index,
+                '_type': self.doc_type,
+                '_id': str(pos['vehicle_id']) + pos['device_ts'],
+                'VehicleID': pos['vehicle_id'],
+                'DeviceTS': pos['device_ts'],
+                'Lat': pos['lat'],
+                'Lon': pos['lon'],
+                'Pos': {"lat": pos['lat'], "lon": pos['lon']},
+                'Speed': pos['speed'],
+                'Direction': pos['bearing'],
+                'State': pos['state'],
+                'Events': pos['events'],
+                'RoadName': pos['road_name'],
+                'RoadType': pos['road_type'],
+                'SpeedLimit': pos['speed_limit'],
+                'OverSpeed': pos['over_speed'],
+                'DeviceTS': self.tz_help.convert_local(pos['device_ts'])
+            } 
+            for pos in position
+        )
+        BaseTable.insert_bulk(self, docs)
+
     def vehicle_stats(self, vehicle_id, date):
         stats = {'Date': date, 'VehicleID': vehicle_id}
 
@@ -39,7 +64,7 @@ class PositionTable(BaseTable):
 
         # get the position points for this vehicle id & date
         pos_search = self.search.query(Q('constant_score',
-                                    filter=vehicle_filter + date_filter))
+                                         filter=vehicle_filter + date_filter))
         stats['GPSPoints'] = pos_search.count()
 
         # no data for this vehicle id, no need to proceed
@@ -48,13 +73,13 @@ class PositionTable(BaseTable):
 
         # get engine on & moving positions
         eng_search = self.search.query(Q('constant_score',
-                                    filter=vehicle_filter + date_filter + ~speed_filter))
+                                         filter=vehicle_filter + date_filter + ~speed_filter))
         stats['EngineOnPoints'] = eng_search.count()
         stats['MovingPoints'] = eng_search.count()
 
         # get overspeeding positions
         overspeed_search = self.search.query(Q('constant_score',
-                                          filter=vehicle_filter + date_filter + overspeed_filter))
+                                               filter=vehicle_filter + date_filter + overspeed_filter))
         stats['OverSpeedCount'] = overspeed_search.count()
 
         # get speed stats
@@ -71,8 +96,8 @@ class PositionTable(BaseTable):
         return stats
 
     def vehicles_by_date(self, start_date, end_date):
-        query = Q('constant_score', 
-            filter=Q('range', DeviceTS={'from': start_date, 'to': end_date}))
+        query = Q('constant_score',
+                  filter=Q('range', DeviceTS={'from': start_date, 'to': end_date}))
         dsl = self.search\
             .query(query)\
             .extra(size=0)\

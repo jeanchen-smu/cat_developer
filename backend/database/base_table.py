@@ -1,6 +1,6 @@
 from config.config_helper import ConfigHelper
 from elasticsearch import Elasticsearch, RequestsHttpConnection
-from elasticsearch.helpers import scan
+from elasticsearch.helpers import scan, bulk
 from requests_aws4auth import AWS4Auth
 from elasticsearch_dsl import Search
 
@@ -37,6 +37,9 @@ class BaseTable:
             body=doc
         )
         return res['created']
+    
+    def insert_bulk(self, docs):
+        return bulk(self.es, docs)
 
     def update(self, id, doc):
         res = self.es.update(
@@ -49,7 +52,8 @@ class BaseTable:
     def select_all(self):
         for rec in scan(self.es,
                         query={"query": {"match_all": {}}},
-                        index=self.index, doc_type=self.doc_type):
+                        index=self.index, doc_type=self.doc_type,
+                        request_timeout=5*60):
             yield rec['_source']
 
     def export(self, file_name):
