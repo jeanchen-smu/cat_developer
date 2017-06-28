@@ -91,7 +91,7 @@ def get_past_journeys():
     return jsonify(data)	
 
 @app.route('/overview', methods=['GET', 'POST'])
-def get_overview_coordinates(): 
+def get_overview_coordinates():
     start_date = request.args.get('startDate')
     end_date = request.args.get('endDate')
     vehicle_list = request.args.get('vehicleList')

@@ -23,7 +23,7 @@ class DashboardPage extends React.Component{
 
   render() {
     return (
-      <PageBase title = "Overview" nagivation = "Application / Overview">
+      <PageBase title = "Overview" navigation = "Application / Overview">
         <div>
           <Kpi />
           <Statistics />
