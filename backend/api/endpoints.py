@@ -99,14 +99,10 @@ def get_past_journeys():
 
 @app.route('/kpi', methods=['POST'])
 def get_kpi():
-    data = {
-        'activeVehicles': 100,
-        'totalDistance': 1000,
-        'longestRideTime': 2,
-        'longestRideDistance': 150,
-        'totalIdling': 10,
-        'lowestScore': 0
-    }
+    start_date = request.args.get('startDate')
+    end_date = request.args.get('endDate')
+    vehicle_list = request.args.get('vehicleList')
+    data = vehicle_score_service.get_kpis(start_date, end_date, vehicle_list)
     return jsonify(data)
 
 
