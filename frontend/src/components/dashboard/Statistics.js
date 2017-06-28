@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardHeader, CardText } from "material-ui/Card";
 import StatGraphs from "./StatGraphs";
-import Data from "../../data";
+import axios from "axios";
 
 const styles = {
     card: {
@@ -17,7 +17,11 @@ class Statistics extends React.Component {
 
     getDefaultState() {
         return {
-            graphData: Data.dashBoardPage
+            graphData: {
+                scoreDistribution: [],
+                averageScore: [],
+                averageDistance: []
+            }
         };
     }
 
@@ -29,16 +33,14 @@ class Statistics extends React.Component {
                 "Content-Type": "application/json"
             },
             data: {
-                startDate: this.props.startDate,
-                endDate: this.props.endDate,
-                vehicleList: this.props.vehicleList
+                startDate: this.props.filterObj.startDate,
+                endDate: this.props.filterObj.endDate,
+                vehicleList: this.props.filterObj.vehicleList
             }
         };
         axios(reqObj)
             .then(resp => {
-                this.setState({
-                    graphData: resp.data
-                });
+                this.setState({ graphData: resp.data });
             })
             .catch(err => {
                 this.setState(this.getDefaultState());
@@ -54,12 +56,12 @@ class Statistics extends React.Component {
             <Card style={styles.card}>
                 <CardHeader
                     title="Statistics"
-                    subtitle="Statistics Graphs"
+                    subtitle="Distribution & Trends"
                     actAsExpander={true}
                     showExpandableButton={true}
                 />
                 <CardText expandable={true}>
-                    <StatGraphs data={Data.dashBoardPage}/>
+                    <StatGraphs data={this.state.graphData} />
                 </CardText>
             </Card>
         );

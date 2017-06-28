@@ -19,7 +19,6 @@ import {
     blue600,
     yellow900
 } from "material-ui/styles/colors";
-import Data from "../../data";
 
 const styles = {
     slide: {

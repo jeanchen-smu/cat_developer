@@ -28,7 +28,7 @@ class DashboardPage extends React.Component {
                     <div>
                         <Kpi filterObj={this.state.filterObj} />
                         <Statistics filterObj={this.state.filterObj} />
-                        {/*<GeoVisualization filterObj={this.state.filterObj} />*/}
+                        <GeoVisualization filterObj={this.state.filterObj} />
                     </div>
                     <div>
                         <FilterDrawer

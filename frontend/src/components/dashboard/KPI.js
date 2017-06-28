@@ -17,7 +17,7 @@ import Warning from "material-ui/svg-icons/alert/warning";
 import InfoBox from "./InfoBox";
 import axios from "axios";
 
-class KPI extends React.Component {
+class Kpi extends React.Component {
     constructor(props) {
         super(props);
         this.state = this.getDefaultState();
@@ -34,7 +34,7 @@ class KPI extends React.Component {
         };
     }
 
-    getKPI() {
+    getKpi() {
         var reqObj = {
             method: "post",
             url: "/api/kpi",
@@ -42,9 +42,9 @@ class KPI extends React.Component {
                 "Content-Type": "application/json"
             },
             data: {
-                startDate: this.props.startDate,
-                endDate: this.props.endDate,
-                vehicleList: this.props.vehicleList
+                startDate: this.props.filterObj.startDate,
+                endDate: this.props.filterObj.endDate,
+                vehicleList: this.props.filterObj.vehicleList
             }
         };
         axios(reqObj)
@@ -64,7 +64,7 @@ class KPI extends React.Component {
     }
 
     componentWillMount() {
-        this.getKPI();
+        this.getKpi();
     }
 
     render() {
@@ -140,4 +140,4 @@ class KPI extends React.Component {
     }
 }
 
-export default KPI;
+export default Kpi;

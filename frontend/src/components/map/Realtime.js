@@ -2,58 +2,59 @@ import React, { PropTypes } from "react";
 import LocationMap from "./LocationMap";
 import axios from "axios";
 import "leaflet/dist/leaflet.css";
-import Data from "../../data";
+//import Data from "../../data";
 
 class Realtime extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			data: []
-		};
-	}
+    constructor(props) {
+        super(props);
+        this.state = {
+            mapData: []
+        };
+    }
 
-	componentWillMount() {
-		this.updateData();
-	}
+    componentWillMount() {
+        this.updateData();
+    }
 
-	componentDidMount() {
-		this.timerID = setInterval(this.updateData.bind(this), 60*1000);
-	}
+    componentDidMount() {
+        this.timerID = setInterval(this.updateData.bind(this), 60 * 1000);
+    }
 
-	componentWillUnmount(){
-		clearInterval(this.timerID);
-	}
+    componentWillUnmount() {
+        clearInterval(this.timerID);
+    }
 
-	updateData() {
-		axios
-			.get("/api/realtime", {
-				Accept: "application/json",
-				"Content-Type": "application/json",
-				params: {
-					vehicleList: this.props.vehicleList
-				}
-			})
-			.then(resp => {
-				this.setState({ data: resp.data });
-			})
-			.catch(err => {
-				this.setState({ data: [] });
-				alert("Fetch error: " + err);
-			});
-	}
+    updateData() {
+        var reqObj = {
+            method: "post",
+            url: "/api/realtime",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            data: {
+                vehicleList: this.props.filterObj.vehicleList
+            }
+        };
+        axios(reqObj)
+            .then(resp => {
+                this.setState({ mapData: resp.data });
+            })
+            .catch(err => {
+                this.setState({ mapData: [] });
+            });
+    }
 
-	render() {
-		let { data } = this.state;
-		return (
-			<div>
-				<LocationMap data={data} />
-			</div>
-		);
-	}
+    render() {
+        return (
+            <div>
+                <LocationMap data={this.state.mapData} />
+            </div>
+        );
+    }
 }
 
 Realtime.propTypes = {
-	vehicleList: PropTypes.array
+    vehicleList: PropTypes.array
 };
 
 export default Realtime;
