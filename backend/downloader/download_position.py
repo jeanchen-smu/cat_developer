@@ -111,8 +111,8 @@ class DownloadWorker(Thread):
 class PositionDownloader:
     def __init__(self, max_workers=10):
         self.max_workers = max_workers
-        self.vehicle_table = VehicleTable()
         self.time_help = TimeHelper()
+        self.vehicles = []
 
     def _prepare_args(self, vehicle, start_date, end_date):
         args = {}
@@ -129,24 +129,30 @@ class PositionDownloader:
         args['access_code'] = vehicle['APIAccessCode']
         return args
 
+    def _get_vehicles(self, max_vehicles):
+        vehicle_table = VehicleTable()
+        for index, vehicle in enumerate(vehicle_table.select_all()):
+                # if the vehicle is not linked to the account, ignore it
+                if vehicle['LinkedToAccount'] == 'N':
+                    continue
+                if max_vehicles and index > max_vehicles:  # for testing purpose, to limit the download
+                    break
+                self.vehicles.append(vehicle)
+        print 'Total vehicles {}'.format(len(self.vehicles))
+
     def start(self, start_date, end_date, max_vehicles=None):
-        # for each active vehicle from VEHICLES table,
-        # get the position data
         workers = []
-        for index, vehicle in enumerate(self.vehicle_table.select_all()):
-            # if the vehicle is not linked to the account, ignore it
-            if vehicle['LinkedToAccount'] == 'N':
-                continue
-            if max_vehicles and index > max_vehicles:  # for testing purpose, to limit the download
-                break
+        # get vehicles (better to read ahead to avoid timeouts)
+        self._get_vehicles(max_vehicles)
         
-            print 'Fetching position data for vehicle {}'.format(
-                vehicle['VehicleID'])
+        # get position data for each vehicle
+        for vehicle in self.vehicles:
+            print 'Fetching vehicle {}'.format(vehicle['VehicleID'])
 
             # start worker threads for parallel  processing
             args = self._prepare_args(vehicle, start_date, end_date)
             worker = DownloadWorker(args) # create worker object (downloads data)
-            worker.start()
+            worker.start() # start processing
             workers.append(worker)
 
             # control parallel processing
