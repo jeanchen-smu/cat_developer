@@ -10,9 +10,34 @@ import Warning from 'material-ui/svg-icons/alert/warning';
 import InfoBox from './InfoBox';  
 
 class KPI extends React.Component{
+    constructor(props) {
+        super(props);
+        this.state = {
+            coordinates: [] //array of [Lat, Long, Speed] 
+        };
+        axios.get("/api/overview", {
+			Accept: "application/json",
+			"Content-Type": "application/json",
+            params: {
+                vehicleList: this.props.filterObj.vehicleList,
+                startDate: this.props.filterObj.startDate,
+                endDate: this.props.filterObj.endDate
+            }
+		})
+        .then((resp) =>{
+            this.setState({ coordinates: resp.data });
+        })
+        .catch(
+            function(err) {
+                this.setState({ coordinates: [] });
+                alert("Fetch error: " + err);
+            }.bind(this)
+        );
+    }
+    
     render(){
         return (
-            <Card>
+            <Card initiallyExpanded={true}>
             <CardHeader
                 title="KPI"
                 subtitle="Key Performance Indicators"
@@ -25,7 +50,7 @@ class KPI extends React.Component{
                     <InfoBox Icon={DirectionsCar}
                             color={pink600}
                             title="Active Vehicles"
-                            value="1500k"
+                            value="1500"
                     />
                 </div>
 

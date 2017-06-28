@@ -4,6 +4,7 @@ from flask_jwt_extended import JWTManager, jwt_required,\
 from service.vehicle_service import VehicleService
 from service.position_service import PositionService
 from service.vehicle_score_service import VehicleScoreService
+import pdb
 
 app = Flask(__name__)
 app.secret_key = "JWT SECRET"
@@ -90,7 +91,7 @@ def get_past_journeys():
     return jsonify(data)	
 
 @app.route('/overview', methods=['GET', 'POST'])
-def get_overview_coordinates(): 
+def get_overview_coordinates():
     start_date = request.args.get('startDate')
     end_date = request.args.get('endDate')
     vehicle_list = request.args.get('vehicleList')

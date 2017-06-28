@@ -10,8 +10,10 @@ const FMLineChart = (props) => {
     div: {
       marginLeft: 'auto',
       marginRight: 'auto',
-      width: '80%',
-      height: 500
+      width: '90%',
+      height: 500,
+      paddingTop: 40,
+      paddingBottom: 20
     },
     header: {
       fontSize: 24,
@@ -24,10 +26,10 @@ const FMLineChart = (props) => {
 
   return (
     <Paper>
-      <div style={{...styles.header}}>{props.title}</div>
+      {/*<div style={{...styles.header}}>{props.title}</div>*/}
       <div style={styles.div}>
         <ResponsiveContainer >
-          <LineChart width={730} height={250} data={props.data}
+          <LineChart data={props.data}
             margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
             <XAxis dataKey='name'/>
             <YAxis />

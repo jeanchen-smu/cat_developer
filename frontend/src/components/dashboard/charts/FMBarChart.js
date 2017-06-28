@@ -10,8 +10,10 @@ const FMBarChart = (props) => {
     div: {
       marginLeft: 'auto',
       marginRight: 'auto',
-      width: '80%',
-      height: 500
+      width: '90%',
+      height: 500,
+      paddingTop: 40,
+      paddingBottom: 20
     },
     header: {
       color: white,
@@ -22,10 +24,10 @@ const FMBarChart = (props) => {
 
   return (
     <Paper>
-      <div style={{...GlobalStyles.title, ...styles.header}}>{props.title}</div>
+      {/*<div style={{...GlobalStyles.title, ...styles.header}}>{props.title}</div>*/}
       <div style={styles.div}>
         <ResponsiveContainer>
-          <BarChart width={730} height={250} data={props.data}>
+          <BarChart data={props.data}>
             <XAxis dataKey="name"/>
             <YAxis />
             <CartesianGrid strokeDasharray="3 3" />
