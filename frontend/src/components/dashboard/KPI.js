@@ -1,103 +1,143 @@
-import React from 'react';
-import {cyan600, pink600, purple600, orange600, red600, blue600} from 'material-ui/styles/colors';
-import {Card, CardHeader, CardText} from 'material-ui/Card'; 
-import DirectionsCar from 'material-ui/svg-icons/maps/directions-car';
-import SwapCalls from 'material-ui/svg-icons/communication/swap-calls';
-import Alarm from 'material-ui/svg-icons/action/alarm';
-import Gesture from 'material-ui/svg-icons/content/gesture';
-import Hotel from 'material-ui/svg-icons/maps/hotel';
-import Warning from 'material-ui/svg-icons/alert/warning';
-import InfoBox from './InfoBox';  
+import React from "react";
+import {
+    cyan600,
+    pink600,
+    purple600,
+    orange600,
+    red600,
+    blue600
+} from "material-ui/styles/colors";
+import { Card, CardHeader, CardText } from "material-ui/Card";
+import DirectionsCar from "material-ui/svg-icons/maps/directions-car";
+import SwapCalls from "material-ui/svg-icons/communication/swap-calls";
+import Alarm from "material-ui/svg-icons/action/alarm";
+import Gesture from "material-ui/svg-icons/content/gesture";
+import Hotel from "material-ui/svg-icons/maps/hotel";
+import Warning from "material-ui/svg-icons/alert/warning";
+import InfoBox from "./InfoBox";
+import axios from "axios";
 
-class KPI extends React.Component{
+class KPI extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {
-            coordinates: [] //array of [Lat, Long, Speed] 
-        };
-        axios.get("/api/overview", {
-			Accept: "application/json",
-			"Content-Type": "application/json",
-            params: {
-                vehicleList: this.props.filterObj.vehicleList,
-                startDate: this.props.filterObj.startDate,
-                endDate: this.props.filterObj.endDate
-            }
-		})
-        .then((resp) =>{
-            this.setState({ coordinates: resp.data });
-        })
-        .catch(
-            function(err) {
-                this.setState({ coordinates: [] });
-                alert("Fetch error: " + err);
-            }.bind(this)
-        );
+        this.state = this.getDefaultState();
     }
-    
-    render(){
+
+    getDefaultState() {
+        return {
+            activeVehicles: 0,
+            totalDistance: 0,
+            longestRideTime: 0,
+            longestRideDistance: 0,
+            totalIdling: 0,
+            lowestScore: 0
+        };
+    }
+
+    getKPI() {
+        var reqObj = {
+            method: "post",
+            url: "/api/kpi",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            data: {
+                startDate: this.props.startDate,
+                endDate: this.props.endDate,
+                vehicleList: this.props.vehicleList
+            }
+        };
+        axios(reqObj)
+            .then(resp => {
+                this.setState({
+                    activeVehicles: resp.data.activeVehicles,
+                    totalDistance: resp.data.totalDistance,
+                    longestRideTime: resp.data.longestRideTime,
+                    longestRideDistance: resp.data.longestRideDistance,
+                    totalIdling: resp.data.totalIdling,
+                    lowestScore: resp.data.lowestScore
+                });
+            })
+            .catch(err => {
+                this.setState(this.getDefaultState());
+            });
+    }
+
+    componentWillMount() {
+        this.getKPI();
+    }
+
+    render() {
         return (
             <Card initiallyExpanded={true}>
-            <CardHeader
-                title="KPI"
-                subtitle="Key Performance Indicators"
-                actAsExpander={true}
-                showExpandableButton={true}
-            />
-            <CardText expandable={true}>
-                <div className="row">
-                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4 m-b-15 ">
-                    <InfoBox Icon={DirectionsCar}
-                            color={pink600}
-                            title="Active Vehicles"
-                            value="1500"
-                    />
-                </div>
+                <CardHeader
+                    title="KPI"
+                    subtitle="Key Performance Indicators"
+                    actAsExpander={true}
+                    showExpandableButton={true}
+                />
+                <CardText expandable={true}>
+                    <div className="row">
+                        <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4 m-b-15 ">
+                            <InfoBox
+                                Icon={DirectionsCar}
+                                color={pink600}
+                                title="Active Vehicles"
+                                value={this.state.activeVehicles.toString()}
+                            />
+                        </div>
 
-                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4 m-b-15 ">
-                    <InfoBox Icon={SwapCalls}
-                            color={cyan600}
-                            title="Total Distance"
-                            value="4231km"
-                    />
-                </div>
+                        <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4 m-b-15 ">
+                            <InfoBox
+                                Icon={SwapCalls}
+                                color={cyan600}
+                                title="Total Distance"
+                                value={this.state.totalDistance + " km"}
+                            />
+                        </div>
 
-                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4 m-b-15 ">
-                    <InfoBox Icon={Alarm}
-                            color={purple600}
-                            title="Longest Time"
-                            value="4.60h"
-                    />
-                </div>
+                        <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4 m-b-15 ">
+                            <InfoBox
+                                Icon={Alarm}
+                                color={purple600}
+                                title="Longest Ride Time"
+                                value={this.state.longestRideTime + " h"}
+                            />
+                        </div>
 
-                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4 m-b-15 ">
-                    <InfoBox Icon={Gesture}
-                            color={orange600}
-                            title="Longest Distance"
-                            value="248km"
-                    />
-                </div>
+                        <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4 m-b-15 ">
+                            <InfoBox
+                                Icon={Gesture}
+                                color={orange600}
+                                title="Longest Ride Distance"
+                                value={this.state.longestRideDistance + " km"}
+                            />
+                        </div>
 
-                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4 m-b-15 ">
-                    <InfoBox Icon={Hotel}
-                            color={blue600}
-                            title="Total Idling"
-                            value="1.2h"
-                    />
-                </div>
+                        <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4 m-b-15 ">
+                            <InfoBox
+                                Icon={Hotel}
+                                color={blue600}
+                                title="Total Idling"
+                                value={this.state.totalIdling + " h"}
+                            />
+                        </div>
 
-                <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4 m-b-15 ">
-                    <InfoBox Icon={Warning}
-                            color={red600}
-                            title="Lowest Score"
-                            value="74/100"
-                    />
-                </div>
-                </div>
+                        <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4 m-b-15 ">
+                            <InfoBox
+                                Icon={Warning}
+                                color={red600}
+                                title="Lowest Score"
+                                value={this.state.lowestScore
+                                    .toFixed(2)
+                                    .toString()}
+                            />
+                        </div>
+                    </div>
                 </CardText>
             </Card>
         );
-    };
-};
+    }
+}
 
 export default KPI;
