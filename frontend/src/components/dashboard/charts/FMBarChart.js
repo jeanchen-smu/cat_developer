@@ -32,7 +32,7 @@ const FMBarChart = (props) => {
             <YAxis />
             <CartesianGrid strokeDasharray="3 3" />
             <Tooltip />
-            <Bar dataKey="uv" fill={props.color} />
+            <Bar dataKey="value" fill={props.color} />
           </BarChart>
         </ResponsiveContainer>
       </div>

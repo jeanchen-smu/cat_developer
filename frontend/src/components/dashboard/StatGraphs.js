@@ -1,4 +1,4 @@
-import React from "react";
+import React, {PropTypes} from "react";
 import {
     Card,
     CardActions,
@@ -27,7 +27,7 @@ const styles = {
     }
 };
 
-export default class StatGraphs extends React.Component {
+class StatGraphs extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -60,7 +60,7 @@ export default class StatGraphs extends React.Component {
                         <FMBarChart
                             headerColor={orange600}
                             title="Vehicle Score Distribution"
-                            data={Data.dashBoardPage.monthlySales}
+                            data={this.props.data.scoreDistribution}
                             color={blue600}
                         />
                     </div>
@@ -68,7 +68,7 @@ export default class StatGraphs extends React.Component {
                         <FMLineChart
                             headerColor={pink600}
                             title="Average Driving Score"
-                            data={Data.dashBoardPage.newOrders}
+                            data={this.props.data.averageScore}
                             color={purple600}
                         />
                     </div>
@@ -76,7 +76,7 @@ export default class StatGraphs extends React.Component {
                         <FMLineChart
                             headerColor={red600}
                             title="Average Driving Distance"
-                            data={Data.dashBoardPage.newOrders}
+                            data={this.props.data.averageDistance}
                             color={yellow900}
                         />
                     </div>
@@ -85,3 +85,9 @@ export default class StatGraphs extends React.Component {
         );
     }
 }
+
+StatGraphs.propTypes = {
+    data: PropTypes.object
+}
+
+export default StatGraphs

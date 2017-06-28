@@ -26,7 +26,7 @@ export default (
 		<Route path="/" component={LoginPage} />
 		<Route path="/login" component={LoginPage} />
 		<Route path="/home" component={App} onEnter={requireAuth}>
-			<IndexRoute component={RankPage} />
+			<IndexRoute component={Dashboard} />
 			<Route path="dashboard" component={Dashboard} />
 			<Route path="tracking" component={TrackingPage} />
 			<Route path="rank" component={RankPage} />

@@ -35,7 +35,7 @@ const FMLineChart = (props) => {
             <YAxis />
             <CartesianGrid strokeDasharray="3 3" />
             <Tooltip />
-            <Line type="monotone" dataKey="pv" stroke={props.color} />
+            <Line type="monotone" dataKey="value" stroke={props.color} />
           </LineChart>
         </ResponsiveContainer>
       </div>

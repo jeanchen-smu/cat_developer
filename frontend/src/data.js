@@ -32,39 +32,41 @@ const data = {
     ]
   },
   dashBoardPage: {
-    recentProducts: [
-      {id: 1, title: 'Samsung TV', text: 'Samsung 32 1080p 60Hz LED Smart HDTV.'},
-      {id: 2, title: 'Playstation 4', text: 'PlayStation 3 500 GB System'},
-      {id: 3, title: 'Apple iPhone 6', text: 'Apple iPhone 6 Plus 16GB Factory Unlocked GSM 4G '},
-      {id: 4, title: 'Apple MacBook', text: 'Apple MacBook Pro MD101LL/A 13.3-Inch Laptop'}
+    scoreDistribution: [
+      {name: 'Jan', value: 3700},
+      {name: 'Feb', value: 3000},
+      {name: 'Mar', value: 2000},
+      {name: 'Apr', value: 2780},
+      {name: 'May', value: 2000},
+      {name: 'Jun', value: 1800},
+      {name: 'Jul', value: 2600},
+      {name: 'Aug', value: 2900},
+      {name: 'Sep', value: 3500},
+      {name: 'Oct', value: 3000},
+      {name: 'Nov', value: 2400},
+      {name: 'Dec', value: 2780}
     ],
-    monthlySales: [
-      {name: 'Jan', uv: 3700},
-      {name: 'Feb', uv: 3000},
-      {name: 'Mar', uv: 2000},
-      {name: 'Apr', uv: 2780},
-      {name: 'May', uv: 2000},
-      {name: 'Jun', uv: 1800},
-      {name: 'Jul', uv: 2600},
-      {name: 'Aug', uv: 2900},
-      {name: 'Sep', uv: 3500},
-      {name: 'Oct', uv: 3000},
-      {name: 'Nov', uv: 2400},
-      {name: 'Dec', uv: 2780}
+    averageScore: [
+      {name: 'Nov', value: 2400},
+      {name: 'Nov', value: 1398},
+      {name: 'Nov', value: 9800},
+      {name: 'Nov', value: 3908},
+      {name: 'Nov', value: 4800},
+      {name: 'Nov', value: 3490},
+      {name: 'Nov', value: 4300}
     ],
-    newOrders: [
-      {pv: 2400},
-      {pv: 1398},
-      {pv: 9800},
-      {pv: 3908},
-      {pv: 4800},
-      {pv: 3490},
-      {pv: 4300}
-    ],
-    browserUsage: [
-      {name: 'Chrome', value: 800, color: cyan600, icon: <ExpandMore/>},
-      {name: 'Firefox', value: 300, color: pink600, icon: <ChevronRight/>},
-      {name: 'Safari', value: 300, color: purple600, icon: <ExpandLess/>}
+    averageDistance: [
+      {name: 'Nov', value: 2400},
+      {name: 'Nov', value: 1398},
+      {name: 'Nov', value: 9800},
+      {name: 'Nov', value: 3908},
+      {name: 'Nov', value: 4800},
+      {name: 'Nov', value: 3490},
+      {name: 'Nov', value: 4300},
+      {name: 'Nov', value: 4300},
+      {name: 'Nov', value: 4300},
+      {name: 'Nov', value: 4300},
+      {name: 'Nov', value: 4300}
     ]
   }
 };
