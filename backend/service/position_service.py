@@ -87,8 +87,9 @@ class PositionService(PositionTable):
             must_filters.append(Q('terms', VehicleID=filter['vehicle_list']))
 
         query = Q('bool', must=must_filters)
-        pos_search = self.search.query(query).extra(size=5000).source(
+        pos_search = self.search.query(query).source(
             ['Lat', 'Lon', 'Speed', 'VehicleID']
-        )
-        for rec in pos_search.scan():
+        ).extra(size=5000)
+
+        for rec in pos_search.execute():
             result.append(rec.to_dict())
