@@ -47,22 +47,24 @@ def get_vehicle_ranks():
 
 @app.route('/realtime', methods=['POST'])
 def get_realtime_location():
-    vehicle_list = request.args.get('vehicleList')
+    
+    vehicle_list = request.args.get('vehicleList')
+    
+    data=[]
 
-    data=[]
-    for veh in baseride.get_vehicle( 'e62a48f233'):
-        if vehicle_list and veh['id'] not in vehicle_list:
-            continue
-        rec = {
-            'VehicleID': veh['id'],
-            'Lat': veh['position']['lat'],
-            'Lon': veh['position']['lon'],
-            'Speed': veh['position']['speed'],
-            'DeviceTS': veh['position']['device_ts']
-        }
-        data.append(rec)
-
-    return jsonify(data)
+    for veh in baseride.get_vehicle( 'e62a48f233'):
+        if vehicle_list and veh['id'] not in vehicle_list:
+            continue
+        rec = {
+            'VehicleID': veh['id'],
+            'Lat': veh['position']['lat'],
+            'Lon': veh['position']['lon'],
+            'Speed': veh['position']['speed'],
+            'DeviceTS': veh['position']['device_ts']
+            }
+        data.append(rec)
+            
+    return jsonify(data)
 
 
 @app.route('/historical', methods=['GET', 'POST'])
