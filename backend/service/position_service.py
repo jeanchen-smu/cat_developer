@@ -82,7 +82,7 @@ class PositionService(PositionTable):
         must_filters = []
         must_filters.append(
             Q('range', DeviceTS={'gte': filter['start_date'], 'lte': filter['end_date']}))
-        if len(filter['vehicle_filter']) > 0:
+        if filter['vehicle_filter'] != None:
             must_filter.append(Q('terms', VehicleID=filter['vehicle_list']))
 
         query = Q('bool', must=must_filters)

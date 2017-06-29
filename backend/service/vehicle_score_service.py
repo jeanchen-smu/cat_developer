@@ -70,7 +70,7 @@ class VehicleScoreService(VehicleScoreTable):
         dist_filter = Q("range", EstimatedDrivingTime={"gte": min_active_time})
         score_filter = Q("range", Score={"gte": 0.01})
         filters = date_filter + dist_filter + score_filter
-        if len(vehicle_list)>0:
+        if vehicle_list:
             vehicle_filter = Q('terms', VehicleID=vehicle_list)
             filters += vehicle_filter
         query = Q("constant_score", filter=filters)
@@ -114,7 +114,7 @@ class VehicleScoreService(VehicleScoreTable):
         dist_filter = Q("range", EstimatedDrivingTime={"gte": min_active_time})
         score_filter = Q("range", Score={"gte": 0.01})
         filters = date_filter + dist_filter + score_filter
-        if len(vehicle_list)>0:
+        if vehicle_list:
             vehicle_filter = Q('terms', VehicleID=vehicle_list)
             filters += vehicle_filter
         query = Q("constant_score", filter=filters)
