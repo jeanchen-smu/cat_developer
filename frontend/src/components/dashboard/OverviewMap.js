@@ -46,10 +46,10 @@ class OverviewMap extends React.Component {
                             <FeatureGroup color="purple">
                                 <HeatmapLayer
                                     points={coordinates}
-                                    gradient={gradient}
-                                    longitudeExtractor={m => m[1]}
-                                    latitudeExtractor={m => m[0]}
-                                    intensityExtractor={m => parseFloat(m[2])}
+                                    /*gradient={gradient}*/
+                                    longitudeExtractor={m => m.Lon}
+                                    latitudeExtractor={m => m.Lat}
+                                    intensityExtractor={m => parseFloat(m.Speed)}
                                 />
                             </FeatureGroup>
                         </LayersControl.Overlay>
