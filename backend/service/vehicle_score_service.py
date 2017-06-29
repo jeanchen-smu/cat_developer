@@ -19,22 +19,41 @@ class VehicleScoreService(VehicleScoreTable):
 
         return latest_date_response['aggregations']['LatestDate']['value_as_string']
 
-    def select_score_by_date_range(self, start_date, end_date, vehicle_list):
-        score_result = []
+    def get_rank(self, start_date, end_date):
+        min_active_time = self.vehicle_score_params['MinActiveTime']
+        rank_data = []
 
         date_filter = Q('range', Date={'from': start_date, 'to': end_date})
-        vehicle_filter = Q('terms', VehicleID=vehicle_list)
-        filters = date_filter
-        if vehicle_list:
-            vehicle_filter = Q('terms', VehicleID=vehicle_list)
-            filters += vehicle_filter
-        score_query = Q("constant_score", filter=filters)
-        score_response = self.get_response(score_query)
+        dist_filter = Q("range", EstimatedDrivingTime={"gte": min_active_time})
+        score_filter = Q("range", Score={"gte": 0.01})
+        score_query = Q("constant_score", filter=date_filter+dist_filter+score_filter)
 
-        for rec in score_response:
-            score_result.append(rec)
+        group_aggs = A("terms", field="VehicleID", order={"AvgScore": "desc"}, size=3000)
+        avg_overspeed_aggs = A("avg", field="MaxSpeed")
+        avg_score_aggs = A("avg", field="Score")
+        avg_time_aggs = A("avg", field="EstimatedDrivingTime")
+        avg_dist_aggs = A("avg", field="EstimatedDrivingDistance")
 
-        return score_result
+        score_search = self.search.query(score_query).aggs.metric("GroupByVehicle", group_aggs)
+        score_search.aggs["GroupByVehicle"].metric("AvgMaxOverspeed", avg_overspeed_aggs)
+        score_search.aggs["GroupByVehicle"].metric("AvgScore", avg_score_aggs)
+        score_search.aggs["GroupByVehicle"].metric("AvgTime", avg_time_aggs)
+        score_search.aggs["GroupByVehicle"].metric("AvgDistance", avg_dist_aggs)
+
+        resp = score_search.execute()["aggregations"]["GroupByVehicle"]["buckets"]
+
+        for rank in resp:
+            rank_data.append({
+                "Rank": resp.index(rank) + 1,
+                "Vehicle ID": rank["key"],
+                "Kind": "--",
+                "Score": round(rank["AvgScore"]["value"]*100, 2),
+                "Max Overspeed": round(rank["AvgMaxOverspeed"]["value"], 2),
+                "Driving Time": round(rank["AvgTime"]["value"], 2),
+                "Distance": round(rank["AvgDistance"]["value"], 2)
+            })
+        
+        return rank_data
 
     def select_active_vehicle_score(self, start_date, end_date, vehicle_list):
         min_active_time = self.vehicle_score_params['MinActiveTime']

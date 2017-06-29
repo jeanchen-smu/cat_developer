@@ -17,6 +17,12 @@ class TimeHelper:
             .astimezone(self.local_tz)\
             .strftime(self.DT_LZ_FORMAT)
 
+    def convert_local_date(self, utc_time):
+        return parse(utc_time)\
+            .astimezone(self.local_tz)\
+            .strftime(self.D_LZ_FORMAT)
+
+
     def convert_utc(self, local_time):
         return parse(local_time)\
             .astimezone(self.utc_tz)\
