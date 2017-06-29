@@ -15,6 +15,9 @@ vehicle_service = VehicleService()
 position_service = PositionService()
 vehicle_score_service = VehicleScoreService()
 
+def to_date(date_string):
+    return date_string.split("T")[0]
+
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -41,15 +44,9 @@ def get_vehicle_ranks():
         "Distance"
     ]
 
-    start_date = request.args.get('startDate')
-    end_date = request.args.get('endDate')
+    start_date = to_date(request.args.get('startDate'))
+    end_date = to_date(request.args.get('endDate'))
     vehicle_list = request.args.get('vehicleList')
-
-    #c = 1/0
-
-    print(start_date)
-    if vehicle_list is None:
-        vehicle_list = vehicle_service.get_all_vehicles()
 
     raw_score_data = vehicle_score_service.select_score_by_date_range(
         start_date, end_date, vehicle_list)
@@ -82,8 +79,8 @@ def get_realtime_location():
 
 @app.route('/historical', methods=['GET', 'POST'])
 def get_past_journeys():
-    start_date = request.args.get('startDate')
-    end_date = request.args.get('endDate')
+    start_date = to_date(request.args.get('startDate'))
+    end_date = to_date(request.args.get('endDate'))
     vehicle_list = request.args.get('vehicleList')
 
     if vehicle_list is None:
@@ -99,18 +96,19 @@ def get_past_journeys():
 
 @app.route('/kpi', methods=['POST'])
 def get_kpi():
-    start_date = request.args.get('startDate')
-    end_date = request.args.get('endDate')
-    vehicle_list = request.args.get('vehicleList')
+    start_date = to_date(request.json.get('startDate'))
+    end_date = to_date(request.json.get('endDate'))
+    vehicle_list = request.json.get('vehicleList')
     data = vehicle_score_service.get_kpis(start_date, end_date, vehicle_list)
     return jsonify(data)
 
 
 @app.route('/stats', methods=['POST'])
 def get_stats():
-    start_date = request.args.get('startDate')
-    end_date = request.args.get('endDate')
-    vehicle_list = request.args.get('vehicleList')
+    start_date = to_date(request.json.get('startDate'))
+    end_date = to_date(request.json.get('endDate'))
+    vehicle_list = request.json.get('vehicleList')
+    # pdb.set_trace()
     data = vehicle_score_service.get_stats(start_date, end_date, vehicle_list)
     return jsonify(data)
 
@@ -118,9 +116,9 @@ def get_stats():
 @app.route('/overview', methods=['POST'])
 def overview():
     filter = {
-        'start_date': request.args.get('startDate'),
-        'end_date': request.args.get('endDate'),
-        'vehicle_list': request.args.get('vehicleList')
+        'start_date': to_date(request.json.get('startDate')),
+        'end_date': to_date(request.json.get('endDate')),
+        'vehicle_list': request.json.get('vehicleList')
         }
     
     data = []

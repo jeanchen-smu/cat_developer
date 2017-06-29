@@ -24,7 +24,11 @@ class VehicleScoreService(VehicleScoreTable):
 
         date_filter = Q('range', Date={'from': start_date, 'to': end_date})
         vehicle_filter = Q('terms', VehicleID=vehicle_list)
-        score_query = Q("constant_score", filter=date_filter + vehicle_filter)
+        filters = date_filter
+        if vehicle_list:
+            vehicle_filter = Q('terms', VehicleID=vehicle_list)
+            filters += vehicle_filter
+        score_query = Q("constant_score", filter=filters)
         score_response = self.get_response(score_query)
 
         for rec in score_response:
@@ -110,7 +114,7 @@ class VehicleScoreService(VehicleScoreTable):
 
         min_active_time = self.vehicle_score_params['MinActiveTime']
 
-        date_filter = Q("range", Date={"gte": start_date, "lte": end_date})
+        date_filter = Q("range", Date={"from": start_date, "to": end_date})
         dist_filter = Q("range", EstimatedDrivingTime={"gte": min_active_time})
         score_filter = Q("range", Score={"gte": 0.01})
         filters = date_filter + dist_filter + score_filter
