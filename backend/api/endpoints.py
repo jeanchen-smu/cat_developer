@@ -124,6 +124,7 @@ def overview():
         }
     
     data = []
+    #pdb.set_trace()
     position_service.vehicle_position(filter, data)
     return jsonify(data)
 

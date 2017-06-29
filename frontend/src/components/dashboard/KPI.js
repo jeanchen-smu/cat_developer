@@ -92,7 +92,7 @@ class Kpi extends React.Component {
                                 Icon={SwapCalls}
                                 color={cyan600}
                                 title="Total Distance"
-                                value={this.state.totalDistance + " km"}
+                                value={this.state.totalDistance.toFixed(2) + " km"}
                             />
                         </div>
 
@@ -101,7 +101,7 @@ class Kpi extends React.Component {
                                 Icon={Alarm}
                                 color={purple600}
                                 title="Longest Ride Time"
-                                value={this.state.longestRideTime + " h"}
+                                value={this.state.longestRideTime.toFixed(2) + " h"}
                             />
                         </div>
 
@@ -110,7 +110,7 @@ class Kpi extends React.Component {
                                 Icon={Gesture}
                                 color={orange600}
                                 title="Longest Ride Distance"
-                                value={this.state.longestRideDistance + " km"}
+                                value={this.state.longestRideDistance.toFixed(2) + " km"}
                             />
                         </div>
 
@@ -119,7 +119,7 @@ class Kpi extends React.Component {
                                 Icon={Hotel}
                                 color={blue600}
                                 title="Total Idling"
-                                value={this.state.totalIdling + " h"}
+                                value={this.state.totalIdling.toFixed(2) + " h"}
                             />
                         </div>
 
@@ -128,9 +128,7 @@ class Kpi extends React.Component {
                                 Icon={Warning}
                                 color={red600}
                                 title="Lowest Score"
-                                value={this.state.lowestScore
-                                    .toFixed(2)
-                                    .toString()}
+                                value={(this.state.lowestScore.toFixed(2)*100).toString()}
                             />
                         </div>
                     </div>

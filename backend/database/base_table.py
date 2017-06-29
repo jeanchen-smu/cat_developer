@@ -26,6 +26,7 @@ class BaseTable:
                     es_params['AccessKeyID'], es_params['AccessKey'], es_params['Region'], 'es'),
                 use_ssl=True,
                 verify_certs=True,
+                timeout = 5*60,
                 connection_class=RequestsHttpConnection
             )
 
