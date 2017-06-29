@@ -21,7 +21,7 @@ class TimeHelper:
         return parse(local_time)\
             .astimezone(self.utc_tz)\
             .strftime(self.DT_UTC_FORMAT)
-
+    
     def parse_ts(self, ts_str):
         return parse(ts_str)
 
