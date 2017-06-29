@@ -3,7 +3,7 @@ import { Map, TileLayer, LayersControl, FeatureGroup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import HeatmapLayer from "react-leaflet-heatmap-layer";
 import MarkerClusterGroup from "react-leaflet-markercluster";
-import axios from "axios";
+
 
 class OverviewMap extends React.Component {
     render() {
@@ -72,7 +72,7 @@ class OverviewMap extends React.Component {
 
 OverviewMap.propTypes = {
     filterObj: PropTypes.object,
-    data: PropTypes.object
+    data: PropTypes.array
 };
 
 export default OverviewMap;
