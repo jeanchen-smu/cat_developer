@@ -69,9 +69,11 @@ class VehicleScoreService(VehicleScoreTable):
         date_filter = Q("range", Date={"gte": start_date, "lte": end_date})
         dist_filter = Q("range", EstimatedDrivingTime={"gte": min_active_time})
         score_filter = Q("range", Score={"gte": 0.01})
-        vehicle_filter = Q('terms', VehicleID=vehicle_list)
-        query = Q("constant_score", filter=date_filter +
-                  dist_filter + score_filter + vehicle_filter)
+        filters = date_filter + dist_filter + score_filter
+        if len(vehicle_list)>0:
+            vehicle_filter = Q('terms', VehicleID=vehicle_list)
+            filters += vehicle_filter
+        query = Q("constant_score", filter=filters)
 
         act_veh_aggs = A("cardinality", field="VehicleID")
         act_veh_search = self.search.query(
@@ -98,3 +100,49 @@ class VehicleScoreService(VehicleScoreTable):
         result["lowestScore"] = kpi_resp["lowestScore"]["value"]
 
         return result
+
+    def get_stats(self, start_date, end_date, vehicle_list):
+        stats_dict = {}
+
+        score_dist_list = []
+        avg_dist_list = []
+        avg_score_list = []
+
+        min_active_time = self.vehicle_score_params['MinActiveTime']
+
+        date_filter = Q("range", Date={"gte": start_date, "lte": end_date})
+        dist_filter = Q("range", EstimatedDrivingTime={"gte": min_active_time})
+        score_filter = Q("range", Score={"gte": 0.01})
+        filters = date_filter + dist_filter + score_filter
+        if len(vehicle_list)>0:
+            vehicle_filter = Q('terms', VehicleID=vehicle_list)
+            filters += vehicle_filter
+        query = Q("constant_score", filter=filters)
+
+        date_aggs = A("date_histogram", field="Date", interval="day")
+        avg_score_aggs = A("avg", field="Score")
+        avg_distance_aggs = A("avg", field="EstimatedDrivingDistance")
+        avg_search = self.search.query(query).extra(
+            size=0).aggs.metric("average_data", date_aggs)
+        avg_search.aggs["average_data"].metric("average_score", avg_score_aggs)
+        avg_search.aggs["average_data"].metric(
+            "average_distance", avg_distance_aggs)
+        for average_data in avg_search.execute()["aggregations"]["average_data"]["buckets"]:
+            date = str(average_data["key_as_string"][:10])
+            avg_dist_list.append({"name": date, "value": round(
+                average_data["average_distance"]["value"], 2)})
+            avg_score_list.append({"name": date, "value": round(
+                average_data["average_score"]["value"], 2)})
+
+        score_dist_aggs = A("histogram", field="Score", interval=0.01)
+        score_dist_search = self.search.query(query).extra(
+            size=0).aggs.metric("scoreDistribution", score_dist_aggs)
+        for score_dist in score_dist_search.execute()["aggregations"]["scoreDistribution"]["buckets"]:
+            score_dist_list.append(
+                {"name": int(score_dist["key"] * 100), "value": score_dist["doc_count"]})
+
+        stats_dict["scoreDistribution"] = score_dist_list
+        stats_dict["averageScore"] = avg_score_list
+        stats_dict["averageDistance"] = avg_dist_list
+
+        return stats_dict

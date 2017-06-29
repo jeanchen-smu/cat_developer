@@ -108,61 +108,22 @@ def get_kpi():
 
 @app.route('/stats', methods=['POST'])
 def get_stats():
-    data = {
-        'scoreDistribution': [
-            {'name': 'Jan', 'value': 3700},
-            {'name': 'Feb', 'value': 3700},
-            {'name': 'Mar', 'value': 3700},
-            {'name': 'Apr', 'value': 3700},
-            {'name': 'May', 'value': 3700},
-            {'name': 'Jun', 'value': 3700},
-            {'name': 'Jul', 'value': 3700},
-            {'name': 'Aug', 'value': 3700},
-            {'name': 'Sep', 'value': 3700},
-            {'name': 'Oct', 'value': 3700},
-            {'name': 'Nov', 'value': 3700},
-            {'name': 'Dec', 'value': 3700}
-        ],
-        averageScore: [
-            {'name': 'Nov', 'value': 3700},
-            {'name': 'Nov', 'value': 3700},
-            {'name': 'Nov', 'value': 3700},
-            {'name': 'Nov', 'value': 3700},
-            {'name': 'Nov', 'value': 3700},
-            {'name': 'Nov', 'value': 3700},
-            {'name': 'Nov', 'value': 3700}
-        ],
-        averageDistance: [
-            {'name': 'Nov', 'value': 2400},
-            {'name': 'Nov', 'value': 1398},
-            {'name': 'Nov', 'value': 9800},
-            {'name': 'Nov', 'value': 3908},
-            {'name': 'Nov', 'value': 4800},
-            {'name': 'Nov', 'value': 3490},
-            {'name': 'Nov', 'value': 4300},
-            {'name': 'Nov', 'value': 4300},
-            {'name': 'Nov', 'value': 4300},
-            {'name': 'Nov', 'value': 4300},
-            {'name': 'Nov', 'value': 4300}
-        ]
-    }
-    return jsonify(data)
-
-
-@app.route('/overview', methods=['GET', 'POST'])
-def get_overview_coordinates():
     start_date = request.args.get('startDate')
     end_date = request.args.get('endDate')
     vehicle_list = request.args.get('vehicleList')
-
-    if vehicle_list is None:
-        vehicle_list = vehicle_service.get_all_vehicles()
-
-    raw_position_data = position_service.select_all_position(
-        end_date, vehicle_list)
-    data = []
-    for position in raw_position_data:
-        position = [str(position['Lat']), str(position['Lon']), str(
-            position['Speed']), str(position['VehicleID'])]
-        data.append(position)
+    data = vehicle_score_service.get_stats(start_date, end_date, vehicle_list)
     return jsonify(data)
+
+
+@app.route('/overview', methods=['POST'])
+def overview():
+    filter = {
+        'start_date': request.args.get('startDate'),
+        'end_date': request.args.get('endDate'),
+        'vehicle_list': request.args.get('vehicleList')
+        }
+    
+    data = []
+    position_service.vehicle_position(filter, data)
+    return jsonify(data)
+
