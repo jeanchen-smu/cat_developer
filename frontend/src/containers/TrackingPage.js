@@ -45,14 +45,14 @@ class TrackingPage extends React.Component {
             >
                 <div>
                     <Tabs>
-                        <Tab label="Realtime">
-                            <div style={styles.map}>
-                                <Realtime filterObj={this.state.filterObj} />
-                            </div>
-                        </Tab>
                         <Tab label="Past Trip">
                             <div style={styles.map}>
                                 <Historical filterObj={this.state.filterObj} />
+                            </div>
+                        </Tab>
+                        <Tab label="Realtime">
+                            <div style={styles.map}>
+                                <Realtime filterObj={this.state.filterObj} />
                             </div>
                         </Tab>
                     </Tabs>

@@ -49,16 +49,16 @@ def get_vehicle_ranks():
 def get_realtime_location():
     
     vehicle_list = request.args.get('vehicleList')
-    
+
     data=[]
 
     for veh in baseride.get_vehicle( 'e62a48f233'):
         if vehicle_list and veh['id'] not in vehicle_list:
             continue
         rec = {
-            'VehicleID': veh['id'],
-            'Lat': veh['position']['lat'],
-            'Lon': veh['position']['lon'],
+            'VehicleID': str(veh['id']),
+            'Lat': float(veh['position']['lat']),
+            'Lon': float(veh['position']['lon']),
             'Speed': veh['position']['speed'],
             'DeviceTS': veh['position']['device_ts']
             }
@@ -69,17 +69,13 @@ def get_realtime_location():
 
 @app.route('/historical', methods=['GET', 'POST'])
 def get_past_journeys():
-    start_date = to_date(request.args.get('startDate'))
-    end_date = to_date(request.args.get('endDate'))
-    vehicle_list = request.args.get('vehicleList')
+    filter = {
+        'start_date': to_date(request.json.get('startDate')),
+        'end_date': to_date(request.json.get('endDate')),
+        'vehicle_list': request.json.get('vehicleList')
+        }
 
-    if vehicle_list is None:
-        vehicle_list = vehicle_service.get_all_vehicles()
-
-    data = []
-    for vehicle in vehicle_list:
-        data.append(
-            [str(vehicle), position_service.select_vehicle_position(end_date, vehicle)])
+    data = position_service.get_trips(filter)
 
     return jsonify(data)
 

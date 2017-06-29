@@ -65,19 +65,40 @@ class PositionService(PositionTable):
         for vehicle_id in resp['aggregations']['VehicleIDs']['buckets']:
             yield vehicle_id
 
-    def select_all_position(self, date, vehicle_list):
-        position_result = []
+    def get_trips(self, filter):
+        must_filters = []
+        result = {}
+        output = []
 
-        date_filter = Q('range', DeviceTS={'from': date, 'to': date})
-        vehicle_filter = Q('terms', VehicleID=vehicle_list)
-        position_query = Q(
-            "constant_score", filter=date_filter + vehicle_filter)
-        position_response = self.get_response(position_query)
+        print filter['vehicle_list']
 
-        for rec in position_response:
-            position_result.append(rec)
+        try:
+            int(filter['vehicle_list'][0])
+        except:
+            return output
 
-        return position_result
+        must_filters.append(
+            Q('range', DeviceTS={'gte': filter['start_date'], 'lte': filter['end_date']}))
+        must_filters.append(Q('terms', VehicleID=filter['vehicle_list']))
+        must_filters.append(Q('range', Speed={'gt': 1}))
+
+        query = Q('bool', must=must_filters)
+        pos_search = self.search.query(query).source(
+            ['Lat', 'Lon', 'OverSpeed', 'VehicleID']
+        ).extra(size=10000)
+
+        for resp in pos_search.execute():
+            try:
+                result[str(resp["VehicleID"])].append(
+                    [resp["Lat"], resp["Lon"], resp["OverSpeed"]])
+            except:
+                result[str(resp["VehicleID"])] = [
+                    [resp["Lat"], resp["Lon"], resp["OverSpeed"]]]
+
+        for key in result:
+            output.append([key, result[key]])
+
+        return output
 
     def vehicle_position(self, filter, result):
         must_filters = []
