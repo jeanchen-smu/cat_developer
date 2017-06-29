@@ -13,13 +13,13 @@ class OverviewMap extends React.Component {
         const coordinates = this.props.data;
         for (let i = 0; i < coordinates.length; i++) {
             markers.push({
-                lat: coordinates[i][0],
-                lng: coordinates[i][1],
+                lat: coordinates[i].Lat,
+                lng: coordinates[i].Lon,
                 popup:
                     "Vehicle ID: " +
-                        coordinates[i][3] +
+                        coordinates[i].VehicleID +
                         " Speed: " +
-                        coordinates[i][2]
+                        coordinates[i].Speed
             });
         }
 
