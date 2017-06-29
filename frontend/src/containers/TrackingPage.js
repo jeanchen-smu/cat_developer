@@ -16,13 +16,21 @@ const styles = {
 class TrackingPage extends React.Component {
     constructor() {
         super();
+        this.state = { filterObj: this.defaultFilter(1, 1) };
+    }
+
+    defaultFilter(startOffset, endOffset) {
+        let start = new Date();
+        start.setDate(start.getDate() - startOffset);
+
+        let end = new Date();
+        end.setDate(end.getDate() - endOffset);
 
         let filterObj = new FilterObj();
-        filterObj.startDate = new Date();
-        filterObj.endDate = new Date();
+        filterObj.startDate = start;
+        filterObj.endDate = end;
         filterObj.vehicleList = [];
-
-        this.state = { filterObj: filterObj };
+        return filterObj;
     }
 
     applyFilter(filterObj) {
@@ -39,11 +47,7 @@ class TrackingPage extends React.Component {
                     <Tabs>
                         <Tab label="Realtime">
                             <div style={styles.map}>
-                                <Realtime
-                                    vehicleList={
-                                        this.state.filterObj.vehicleList
-                                    }
-                                />
+                                <Realtime filterObj={this.state.filterObj} />
                             </div>
                         </Tab>
                         <Tab label="Past Trip">

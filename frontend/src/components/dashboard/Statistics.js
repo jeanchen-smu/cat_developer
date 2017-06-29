@@ -29,9 +29,10 @@ class Statistics extends React.Component {
         var reqObj = {
             method: "post",
             url: "/api/stats",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers:{
+				"Content-Type": "application/json",
+				Authorization: "Bearer " + localStorage.getItem("access_token")            
+			}, 
             data: {
                 startDate: this.props.filterObj.startDate,
                 endDate: this.props.filterObj.endDate,
@@ -54,7 +55,7 @@ class Statistics extends React.Component {
     componentWillReceiveProps(nextProps){
         this.getStatistics();
     }
-    
+
     render() {
         return (
             <Card style={styles.card}>

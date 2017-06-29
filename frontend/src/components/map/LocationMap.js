@@ -14,22 +14,21 @@ class LocationMap extends React.Component {
         for (let i = 0; i < data.length; i++) {
             vehicles.push(
                 <Vehicle
-                    gpsNumber={data[i][0]}
-                    vehicleId={data[i][1]}
-                    longitude={data[i][2]}
-                    latitude={data[i][3]}
-                    speed={data[i][4]}
-                    timeStamp={data[i][5]}
-                    overspeed={data[i][6]}
-                    key={data[i][0]}
+                    vehicleId={data[i].VehicleID}
+                    longitude={data[i].Lon}
+                    latitude={data[i].Lat}
+                    speed={data[i].Speed}
+                    timeStamp={data[i].DeviceTS}
+                    overspeed={0}
+                    key={data[i].VehicleID}
                 />
             );
         }
         for (let i = 0; i < data.length; i++) {
             markers.push({
-                lat: data[i][3],
-                lng: data[i][2],
-                popup: "Vehicle ID: " + data[i][1] + " Speed: " + data[i][4]
+                lat: data[i].Lat,
+                lng: data[i].Lon,
+                popup: "Vehicle ID: " + data[i].VehicleID + " Speed: " + data[i].Speed
             });
         }
 

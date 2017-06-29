@@ -8,18 +8,17 @@ import FilterDrawer, { FilterObj } from "../components/filter/FilterDrawer";
 class DashboardPage extends React.Component {
     constructor() {
         super();
-        this.state = { filterObj: defaultFilter() };
+        this.state = { filterObj: this.defaultFilter(7,1) };
     }
 
-    defaultFilter() {
-        let filterObj = new FilterObj();
+    defaultFilter(startOffset, endOffset) {
         let start = new Date();
-        let end = new Date();
+        start.setDate(start.getDate() - startOffset);
         
-        //one week
-        start.setDate(start.getDate() - 7);
-        end.setDate(end.getDate() - 1);
-
+        let end = new Date();
+        end.setDate(end.getDate() - endOffset);
+        
+        let filterObj = new FilterObj();
         filterObj.startDate = start;
         filterObj.endDate = end;
         filterObj.vehicleList = [];

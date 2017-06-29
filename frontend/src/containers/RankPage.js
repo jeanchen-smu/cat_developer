@@ -7,17 +7,26 @@ import axios from "axios";
 class RankPage extends React.Component {
 	constructor() {
 		super();
-		//alert('constructor');
-		let filterObj = new FilterObj();
-		filterObj.startDate = new Date();
-		filterObj.endDate = new Date();
-
 		this.state = {
 			sortAscending: true,
-			filterObj: filterObj,
+			filterObj: this.defaultFilter(1,1),
 			rankingData: []
 		};
 	}
+
+    defaultFilter(startOffset, endOffset) {
+        let start = new Date();
+        start.setDate(start.getDate() - startOffset);
+        
+        let end = new Date();
+        end.setDate(end.getDate() - endOffset);
+        
+        let filterObj = new FilterObj();
+        filterObj.startDate = start;
+        filterObj.endDate = end;
+        filterObj.vehicleList = [];
+        return filterObj;
+    }
 
 	componentDidMount() {
 		this.refreshRankingData();
@@ -25,12 +34,13 @@ class RankPage extends React.Component {
 
 	getRankingReqObj(){
 		return {
-            method: "get",
+            method: "post",
             url: "/api/rank",
 			headers:{
+				"Content-Type": "application/json",
 				Authorization: "Bearer " + localStorage.getItem("access_token")            
 			}, 
-			params: {
+			data: {
 				startDate: this.state.filterObj.startDate,
 				endDate: this.state.filterObj.endDate
 			}	
@@ -45,7 +55,6 @@ class RankPage extends React.Component {
 			})
 			.catch(err => {
 				this.setState({ rankingData: [] });
-				alert("Fetch error : " + err);
 			});
 	}
 

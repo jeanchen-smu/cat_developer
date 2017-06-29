@@ -17,7 +17,7 @@ class Realtime extends React.Component {
     }
 
     componentDidMount() {
-        this.timerID = setInterval(this.updateData.bind(this), 60 * 1000);
+        this.timerID = setInterval(this.updateData.bind(this), 5 * 60 * 1000);
     }
 
     componentWillUnmount() {
@@ -32,9 +32,10 @@ class Realtime extends React.Component {
         var reqObj = {
             method: "post",
             url: "/api/realtime",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers:{
+				"Content-Type": "application/json",
+				Authorization: "Bearer " + localStorage.getItem("access_token")            
+			}, 
             data: {
                 vehicleList: this.props.filterObj.vehicleList
             }
@@ -58,7 +59,7 @@ class Realtime extends React.Component {
 }
 
 Realtime.propTypes = {
-    vehicleList: PropTypes.array
+    filterObj: PropTypes.object
 };
 
 export default Realtime;

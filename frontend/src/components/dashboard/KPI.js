@@ -39,7 +39,8 @@ class Kpi extends React.Component {
             method: "post",
             url: "/api/kpi",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + localStorage.getItem("access_token")
             },
             data: {
                 startDate: this.props.filterObj.startDate,

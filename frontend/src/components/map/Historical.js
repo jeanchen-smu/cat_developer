@@ -16,9 +16,10 @@ class Historical extends React.Component {
         var reqObj = {
             method: "post",
             url: "/api/historical",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers:{
+				"Content-Type": "application/json",
+				Authorization: "Bearer " + localStorage.getItem("access_token")            
+			}, 
             data: {
                 startDate: this.props.filterObj.startDate,
                 endDate: this.props.filterObj.endDate,
