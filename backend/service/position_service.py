@@ -70,8 +70,6 @@ class PositionService(PositionTable):
         result = {}
         output = []
 
-        print filter['vehicle_list']
-
         try:
             int(filter['vehicle_list'][0])
         except:
