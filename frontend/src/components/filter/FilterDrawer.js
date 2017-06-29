@@ -110,7 +110,7 @@ class FilterDrawer extends React.Component {
 								<DatePicker
 									defaultDate={this.state.filterObj.startDate}
 									hintText="Start Date"
-									container="inline"
+									container="inline"					
 									onChange={this.setStartDate.bind(this)}
 								/>
 								<DatePicker

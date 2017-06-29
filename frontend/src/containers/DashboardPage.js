@@ -9,9 +9,9 @@ class DashboardPage extends React.Component {
     constructor() {
         super();
 
-        let filterObj = new FilterObj();
-        filterObj.startDate = new Date();
-        filterObj.endDate = new Date();
+        let filterObj = new FilterObj(), start = new Date(), end = new Date();
+        filterObj.startDate = start;
+        filterObj.endDate = end;
         filterObj.vehicleList = [];
 
         this.state = { filterObj: filterObj };
@@ -19,6 +19,7 @@ class DashboardPage extends React.Component {
 
     applyFilter(filterObj) {
         this.setState({ filterObj: filterObj });
+        //alert('filter callback');
     }
 
     render() {

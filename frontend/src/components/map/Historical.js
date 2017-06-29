@@ -38,6 +38,10 @@ class Historical extends React.Component {
 		this.getMapData();
 	}
 
+	componentWillReceiveProps(nextProps){
+        this.getMapData();
+    }
+
 	render() {
 		let routes = this.state.mapData.slice(0, 1);
 		{/*let routes = this.state.tripData;*/}

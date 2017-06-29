@@ -24,6 +24,10 @@ class Realtime extends React.Component {
         clearInterval(this.timerID);
     }
 
+    componentWillReceiveProps(nextProps){
+        this.updateData();
+    }
+
     updateData() {
         var reqObj = {
             method: "post",

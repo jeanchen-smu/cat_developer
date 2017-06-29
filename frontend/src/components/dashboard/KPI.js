@@ -67,6 +67,10 @@ class Kpi extends React.Component {
         this.getKpi();
     }
 
+    componentWillReceiveProps(nextProps){
+        this.getKpi();
+    }
+
     render() {
         return (
             <Card initiallyExpanded={true}>

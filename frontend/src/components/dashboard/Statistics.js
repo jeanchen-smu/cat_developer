@@ -51,6 +51,10 @@ class Statistics extends React.Component {
         this.getStatistics();
     }
 
+    componentWillReceiveProps(nextProps){
+        this.getStatistics();
+    }
+    
     render() {
         return (
             <Card style={styles.card}>

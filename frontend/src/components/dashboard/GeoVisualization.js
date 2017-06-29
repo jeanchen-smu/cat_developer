@@ -42,6 +42,10 @@ class GeoVisualization extends React.Component {
         this.getMapData();
     }
 
+    componentWillReceiveProps(nextProps){
+        this.getMapData();
+    }
+
     render() {
         return (
             <Card style={styles.card}>
