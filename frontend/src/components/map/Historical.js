@@ -36,7 +36,7 @@ class Historical extends React.Component {
             });
     }
 
-	componentWillMount() {
+	componentDidMount() {
 		this.getMapData();
 	}
 

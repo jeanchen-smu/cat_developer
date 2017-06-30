@@ -12,11 +12,8 @@ class Realtime extends React.Component {
         };
     }
 
-    componentWillMount() {
-        this.updateData();
-    }
-
     componentDidMount() {
+        this.updateData();
         this.timerID = setInterval(this.updateData.bind(this), 5 * 60 * 1000);
     }
 

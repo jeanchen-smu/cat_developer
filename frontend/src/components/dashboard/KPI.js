@@ -64,7 +64,7 @@ class Kpi extends React.Component {
             });
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.getKpi();
     }
 

@@ -39,7 +39,7 @@ class GeoVisualization extends React.Component {
             });
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.getMapData();
     }
 

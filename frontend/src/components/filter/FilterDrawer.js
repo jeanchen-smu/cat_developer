@@ -76,7 +76,7 @@ class FilterDrawer extends React.Component {
             });
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.retrieveVehicles();
     }
 

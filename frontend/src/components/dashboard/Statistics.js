@@ -48,7 +48,7 @@ class Statistics extends React.Component {
             });
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.getStatistics();
     }
 
