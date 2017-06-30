@@ -112,3 +112,7 @@ def overview():
     position_service.vehicle_position(filter, data)
     return jsonify(data)
 
+@app.route('/vehicles', methods=['GET', 'POST'])
+def get_vehicles():
+    data = vehicle_service.get_all_vehicles
+    return jsonify(data)
