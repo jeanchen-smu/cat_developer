@@ -10,7 +10,6 @@ import pdb
 
 app = Flask(__name__)
 app.secret_key = "JWT SECRET"
-
 jwt = JWTManager(app)
 
 vehicle_service = VehicleService()
@@ -19,8 +18,10 @@ vehicle_score_service = VehicleScoreService()
 time_helper = TimeHelper()
 baseride = Baseride()
 
+
 def to_date(utc_string):
     return time_helper.convert_local_date(utc_string)
+
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -42,40 +43,6 @@ def get_vehicle_ranks():
 
     data = vehicle_score_service.get_rank(
         start_date, end_date)
-
-    return jsonify(data)
-
-@app.route('/realtime', methods=['POST'])
-def get_realtime_location():
-    
-    vehicle_list = request.args.get('vehicleList')
-
-    data=[]
-
-    for veh in baseride.get_vehicle( 'e62a48f233'):
-        if vehicle_list and veh['id'] not in vehicle_list:
-            continue
-        rec = {
-            'VehicleID': str(veh['id']),
-            'Lat': float(veh['position']['lat']),
-            'Lon': float(veh['position']['lon']),
-            'Speed': veh['position']['speed'],
-            'DeviceTS': veh['position']['device_ts']
-            }
-        data.append(rec)
-            
-    return jsonify(data)
-
-
-@app.route('/historical', methods=['GET', 'POST'])
-def get_past_journeys():
-    filter = {
-        'start_date': to_date(request.json.get('startDate')),
-        'end_date': to_date(request.json.get('endDate')),
-        'vehicle_list': request.json.get('vehicleList')
-        }
-
-    data = position_service.get_trips(filter)
 
     return jsonify(data)
 
@@ -105,10 +72,41 @@ def overview():
         'start_date': to_date(request.json.get('startDate')),
         'end_date': to_date(request.json.get('endDate')),
         'vehicle_list': request.json.get('vehicleList')
-        }
-    
+    }
     data = []
-    #pdb.set_trace()
     position_service.vehicle_position(filter, data)
     return jsonify(data)
 
+
+@app.route('/realtime', methods=['POST'])
+def get_realtime_location():
+    vehicle_list = request.args.get('vehicleList')
+    data = []
+
+    for veh in baseride.get_vehicle('e62a48f233'):
+        if vehicle_list and veh['id'] not in vehicle_list:
+            continue
+        rec = {
+            'VehicleID': str(veh['id']),
+            'Lat': float(veh['position']['lat']),
+            'Lon': float(veh['position']['lon']),
+            'Speed': veh['position']['speed'],
+            'DeviceTS': veh['position']['device_ts']
+        }
+        data.append(rec)
+
+    return jsonify(data)
+
+
+@app.route('/historical', methods=['GET', 'POST'])
+def get_past_journeys():
+    filter = {
+        'start_date': to_date(request.json.get('startDate')),
+        'end_date': to_date(request.json.get('endDate')),
+        'vehicle_list': request.json.get('vehicleList')
+    }
+
+    data = {}
+    position_service.get_trips(filter, data)
+
+    return jsonify(data)

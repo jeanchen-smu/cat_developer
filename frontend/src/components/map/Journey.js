@@ -10,9 +10,9 @@ class Journey extends React.Component {
         let latlngList = [];
 
         for (let i = 0; i < positions.length; i++) {
-            let latlng = [positions[i][0], positions[i][1]];
+            let latlng = [positions[i].Lat, positions[i].Lon];
             latlngList.push(latlng);
-            let overspeed = positions[i][2];
+            let overspeed = positions[i].OverSpeed;
             let color = overspeed > 0 ? "red" : "blue";
             pointList.push(
                 overspeed > 0 &&
@@ -27,8 +27,8 @@ class Journey extends React.Component {
                     >
                         <Popup>
                             <p>
-                                <b>Time: </b>{positions[i][4]}<br />
-                                <b>Speed: </b>{positions[i][3]}
+                                <b>Time: </b>{positions[i].DeviceTS}<br />
+                                <b>Speed: </b>{positions[i].Speed}
                             </p>
                         </Popup>
                     </Circle>

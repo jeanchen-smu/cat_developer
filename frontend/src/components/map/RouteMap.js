@@ -10,12 +10,12 @@ class RouteMap extends React.Component {
         const singapore = [1.36716, 103.80921];
 
         let journeys = [];
-        for (let i = 0; i < routes.length; i++) {
+        for (var vehicle_id in routes) {
             journeys.push(
                 <Journey
-                    vehicleID={routes[i][0]}
-                    positions={routes[i][1]}
-                    key={routes[i][0]}
+                    vehicleID={vehicle_id}
+                    positions={routes[vehicle_id]}
+                    key={vehicle_id}
                 />
             );
         }
@@ -33,7 +33,7 @@ class RouteMap extends React.Component {
 }
 
 RouteMap.propTypes = {
-    routes: PropTypes.array
+    routes: PropTypes.object
 };
 
 export default RouteMap;

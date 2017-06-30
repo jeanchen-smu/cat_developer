@@ -8,7 +8,8 @@ class Historical extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			mapData: [] //array of [vehicleID, positions]
+			//{vehicle_id:[{Lat:##, Lon:##, Speed:##, OverSpeed:##, DeviceTS:##},]}
+			mapData: {} 
 		};
 	}
 
@@ -31,7 +32,7 @@ class Historical extends React.Component {
                 this.setState({ mapData: resp.data });
             })
             .catch(err => {
-                this.setState({ mapData: [] });
+                this.setState({ mapData: {} });
             });
     }
 
@@ -44,11 +45,9 @@ class Historical extends React.Component {
     }
 
 	render() {
-		let routes = this.state.mapData;
-		{/*let routes = this.state.tripData;*/}
 		return (
 			<div>
-				<RouteMap routes={routes} />
+				<RouteMap routes={this.state.mapData} />
 			</div>
 		);
 	}
