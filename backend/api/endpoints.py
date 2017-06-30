@@ -116,6 +116,7 @@ def get_past_journeys():
     position_service.get_trips(filter, data)
     return jsonify(data)
 
+
 @app.route('/vehicles', methods=['GET', 'POST'])
 @jwt_required
 def get_vehicles():
