@@ -114,5 +114,5 @@ def overview():
 
 @app.route('/vehicles', methods=['GET', 'POST'])
 def get_vehicles():
-    data = vehicle_service.get_all_vehicles
+    data = vehicle_service.get_all_vehicles()
     return jsonify(data)
