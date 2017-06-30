@@ -80,7 +80,7 @@ class PositionService(PositionTable):
         ).extra(size=10000).sort('DeviceTS')
 
         for veh_id in filter['vehicle_list']:
-            result[int(veh_id)] = []
+            result[veh_id] = []
         for rec in pos_search.execute():
             _rec = rec.to_dict()
             result[_rec['VehicleID']].append(_rec)

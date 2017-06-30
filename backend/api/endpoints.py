@@ -17,6 +17,7 @@ position_service = PositionService()
 vehicle_score_service = VehicleScoreService()
 time_helper = TimeHelper()
 baseride = Baseride()
+accessible_vehicles = vehicle_service.vehicle_ids()
 
 
 def to_date(utc_string):
@@ -48,6 +49,7 @@ def get_vehicle_ranks():
 
 
 @app.route('/kpi', methods=['POST'])
+@jwt_required
 def get_kpi():
     start_date = to_date(request.json.get('startDate'))
     end_date = to_date(request.json.get('endDate'))
@@ -57,6 +59,7 @@ def get_kpi():
 
 
 @app.route('/stats', methods=['POST'])
+@jwt_required
 def get_stats():
     start_date = to_date(request.json.get('startDate'))
     end_date = to_date(request.json.get('endDate'))
@@ -67,6 +70,7 @@ def get_stats():
 
 
 @app.route('/overview', methods=['POST'])
+@jwt_required
 def overview():
     filter = {
         'start_date': to_date(request.json.get('startDate')),
@@ -77,11 +81,11 @@ def overview():
     position_service.vehicle_position(filter, data)
     return jsonify(data)
 
-<<<<<<< HEAD
 
 @app.route('/realtime', methods=['POST'])
+@jwt_required
 def get_realtime_location():
-    vehicle_list = request.args.get('vehicleList')
+    vehicle_list = request.json.get('vehicleList')
     data = []
 
     for veh in baseride.get_vehicle('e62a48f233'):
@@ -100,6 +104,7 @@ def get_realtime_location():
 
 
 @app.route('/historical', methods=['GET', 'POST'])
+@jwt_required
 def get_past_journeys():
     filter = {
         'start_date': to_date(request.json.get('startDate')),
@@ -109,10 +114,9 @@ def get_past_journeys():
 
     data = {}
     position_service.get_trips(filter, data)
-
-=======
-@app.route('/vehicles', methods=['GET', 'POST'])
-def get_vehicles():
-    data = vehicle_service.get_all_vehicles()
->>>>>>> e842ee53f448f16c84e34cf0735e8912009d4d95
     return jsonify(data)
+
+@app.route('/vehicles', methods=['GET', 'POST'])
+@jwt_required
+def get_vehicles():
+    return jsonify(accessible_vehicles)

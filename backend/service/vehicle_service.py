@@ -29,3 +29,11 @@ class VehicleService(VehicleTable):
             vehicle_result.append(str(rec['VehicleID']))
         
         return vehicle_result
+
+    def vehicle_ids(self):
+        result = []
+        query = Q('match', LinkedToAccount='Y')
+        veh_search = self.search.query(query).extra(size=1000).source(['VehicleID'])
+        for rec in veh_search.execute():
+            result.append(rec.to_dict()['VehicleID'])
+        return result
