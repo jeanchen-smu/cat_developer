@@ -77,6 +77,7 @@ def overview():
     position_service.vehicle_position(filter, data)
     return jsonify(data)
 
+<<<<<<< HEAD
 
 @app.route('/realtime', methods=['POST'])
 def get_realtime_location():
@@ -109,4 +110,9 @@ def get_past_journeys():
     data = {}
     position_service.get_trips(filter, data)
 
+=======
+@app.route('/vehicles', methods=['GET', 'POST'])
+def get_vehicles():
+    data = vehicle_service.get_all_vehicles()
+>>>>>>> e842ee53f448f16c84e34cf0735e8912009d4d95
     return jsonify(data)

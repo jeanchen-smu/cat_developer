@@ -3,13 +3,14 @@ import Drawer from "material-ui/Drawer";
 import DatePicker from "material-ui/DatePicker";
 import FloatingActionButton from "material-ui/FloatingActionButton";
 import RaisedButton from "material-ui/RaisedButton";
-//import FilterList from "material-ui/svg-icons/content/filter-list";
 import HorizIcon from "material-ui/svg-icons/navigation/more-horiz";
-
+import Chip from "material-ui/Chip";
 import TextField from "material-ui/TextField";
+import SelectField from "material-ui/SelectField";
 import { typography } from "material-ui/styles";
 import { white } from "material-ui/styles/colors";
-//import * as moment from 'moment';
+import MenuItem from "material-ui/MenuItem";
+import axios from "axios";
 
 const styles = {
 	button: {
@@ -52,8 +53,47 @@ class FilterDrawer extends React.Component {
 		super(props);
 		this.state = {
 			drawerOpen: false,
-			filterObj: props.filterObj
+			filterObj: props.filterObj,
+			allVehicles:[]
 		};
+	}
+
+	retrieveVehicles() {		
+        var reqObj = {
+            method: "get",
+            url: "/api/vehicles",
+            headers:{
+				"Content-Type": "application/json",
+				Authorization: "Bearer " + localStorage.getItem("access_token")            
+			}
+        };
+        axios(reqObj)
+            .then(resp => {
+                this.setState({ allVehicles: resp.data });
+				console.log(this.state.allVehicles);
+            })
+            .catch(err => {
+                this.setState({ allVehicles: [] });
+            });
+    }
+
+	componentWillMount() {
+		console.log('component mounting')
+		this.retrieveVehicles();
+		console.log('component mounted')
+	}
+
+	menuItems(values) {
+		const {allVehicles} = this.state;
+		return allVehicles.map((vehicleID) => (
+		<MenuItem
+			key={vehicleID}
+			insetChildren={true}
+			checked={values && values.indexOf(vehicleID) > -1}
+			value={vehicleID}
+			primaryText={vehicleID}
+		/>
+		));
 	}
 
 	toggleDrawer() {
@@ -78,12 +118,19 @@ class FilterDrawer extends React.Component {
 		this.setState({ filterObj: filterObj });
 	}
 
+	handleVehicleChange(event, index, values) {
+		let filterObj = this.state.filterObj;
+		filterObj.vehicleList = values;
+		this.setState({ filterObj: filterObj });
+	}
+
 	applyFilter() {
 		this.props.applyFilter(this.state.filterObj);
 		this.setState({drawerOpen:false});
 	}
 
 	render() {
+		const values = this.state.filterObj.vehicleList;
 		return (
 			<div>
 				<div>
@@ -124,10 +171,15 @@ class FilterDrawer extends React.Component {
 								Vehicle Filter
 							</div>
 							<div style={styles.filter.content}>
-								<TextField
-									hintText="Vehicle ID"
-									onChange={this.setVehicleList.bind(this)}
-								/>
+								<SelectField
+									multiple={true}
+									hintText="Select Vehicle ID"
+									value={values}
+									maxHeight={200}
+									onChange={this.handleVehicleChange.bind(this)}
+								>
+									{this.menuItems(values)}
+								</SelectField>
 							</div>
 							<div style={styles.filter.header}>
 								<RaisedButton
@@ -147,7 +199,8 @@ class FilterDrawer extends React.Component {
 FilterDrawer.propTypes = {
 	drawerOpen: PropTypes.bool,
 	filterObj: PropTypes.object,
-	applyFilter: PropTypes.func
+	applyFilter: PropTypes.func,
+	allVehicles: PropTypes.array
 };
 
 /*filter object that should be passed to the Filter Component*/
