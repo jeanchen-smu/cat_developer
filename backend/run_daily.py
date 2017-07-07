@@ -36,9 +36,8 @@ def download_historic_positions(start_date, end_date, step=7):
 
 
 if __name__ == '__main__':
-    vehicle_downloader.start()
-    es.indices.refresh(index='_all')
-    #end = datetime.today() - timedelta(1)
-    #start = end - timedelta(7)
-    #download_historic_positions(start.date(), end.date())
-    download_historic_positions(date(2017,6,1), date(2017,6,29))
+    # vehicle_downloader.start()
+    # es.indices.refresh(index='_all')
+    end = datetime.today() - timedelta(1)
+    start = end
+    download_historic_positions(start.date(), end.date())

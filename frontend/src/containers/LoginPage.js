@@ -82,8 +82,8 @@ class LoginPage extends React.Component {
     constructor() {
         super();
         this.state = {
-            username: "goldbell",
-            password: "1234",
+            username: "",
+            password: "",
             uname_error_msg: "",
             pwd_error_msg: ""
         };
@@ -131,7 +131,7 @@ class LoginPage extends React.Component {
 	}
 
     handleLogin() {
-        //if (!this.validate()) return;
+        if (!this.validate()) return;
 
         axios(this.getRequestObj())
             .then(resp => {
