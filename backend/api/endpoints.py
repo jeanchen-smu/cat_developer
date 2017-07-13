@@ -125,24 +125,14 @@ def get_vehicles():
 @app.route('/month', methods=['GET', 'POST'])
 @jwt_required
 def get_months():
-    data = ["May 2017", "June 2017", "Current"]
+    data = ["June 2017", "Current"]
     return jsonify(data)
 
 @app.route('/monthly_discount', methods=['GET', 'POST'])
 @jwt_required
 def get_monthly_discount():
     month = request.json.get('month')
-    print('selected month is ' + month)
-    if month == 'May 2017':
-        data = {
-            "claims": 0,
-            "mileage": 2000,
-            "score": 0.90,
-            "crossSell": 1,
-            "pilotProgram": 1,
-            "rebate": 350
-        }
-    elif month == 'June 2017':
+    if month == 'June 2017':
         data = {
             "claims": 1,
             "mileage": 1800,
@@ -171,5 +161,15 @@ def get_monthly_discount():
         }
     return jsonify(data)
 
-
+@app.route('/score', methods=['GET', 'POST'])
+@jwt_required
+def get_scoring_stats():
+    month = request.json.get('month')
+    start_date, end_date = time_helper.convert_month(month)
+    data = {}
+    avg_score_list = vehicle_score_service.get_monthly_stats(accessible_vehicles)
+    score_dist_list = vehicle_score_service.get_score_dist(start_date, end_date, accessible_vehicles)
+    data["scoreDistribution"] = score_dist_list
+    data["averageScore"] = avg_score_list
+    return jsonify(data)
 

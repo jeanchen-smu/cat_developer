@@ -1,6 +1,7 @@
 from dateutil.parser import parse
 from datetime import datetime, timedelta
 import pytz
+from dateparser import parse
 
 
 class TimeHelper:
@@ -52,3 +53,11 @@ class TimeHelper:
     def date_range(self, start_date, end_date):
         for day in range((end_date - start_date).days + 1):
             yield (start_date + timedelta(day)).strftime(self.D_LZ_FORMAT)
+    
+    def convert_month(self, month):
+        start_date = parse(month, settings={'PREFER_DAY_OF_MONTH': 'first'})
+        end_date = parse(month, settings={'PREFER_DAY_OF_MONTH': 'last'})
+        return start_date, end_date
+        
+
+        

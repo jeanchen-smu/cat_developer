@@ -169,3 +169,53 @@ class VehicleScoreService(VehicleScoreTable):
         stats_dict["averageDistance"] = avg_dist_list
 
         return stats_dict
+
+    # retrieve average driving scores over past few months
+    def get_monthly_stats(self, vehicle_list):
+        avg_score_list = []
+
+        min_active_time = self.vehicle_score_params['MinActiveTime']
+
+        dist_filter = Q("range", EstimatedDrivingTime={"gte": min_active_time})
+        filters = dist_filter
+        if vehicle_list:
+            vehicle_filter = Q('terms', VehicleID = vehicle_list)
+            filters += vehicle_filter
+
+        query = Q("constant_score", filter = filters)
+
+        date_aggs = A("date_histogram", field = "Date", interval="month")
+        avg_score_aggs = A("avg", field="Score")
+        avg_search = self.search.query(query).aggs.metric("average_data", date_aggs)
+        avg_search.aggs["average_data"].metric("average_score", avg_score_aggs)
+        for avg_score_data in avg_search.execute()["aggregations"]["average_data"]["buckets"]:
+            month = str(avg_score_data["key_as_string"][:10])
+            avg_score_list.append({"name": month, "value": round(
+                avg_score_data["average_score"]["value"], 2)})
+
+        return avg_score_list
+    
+
+    def get_score_dist(self, start_date, end_date, vehicle_list):
+        score_dist_list = []
+
+        min_active_time = self.vehicle_score_params['MinActiveTime']
+
+        dist_filter = Q("range", EstimatedDrivingTime={"gte": min_active_time})
+        date_filter = Q("range", Date={"from": start_date, "to": end_date})
+        score_filter = Q("range", Score={"gte": 0.01})
+        filters = date_filter + score_filter + dist_filter
+        if vehicle_list:
+            vehicle_filter = Q('terms', VehicleID = vehicle_list)
+            filters += vehicle_filter
+        query = Q("constant_score", filter = filters)
+
+        score_dist_aggs = A("histogram", field="Score", interval=0.01)
+        score_dist_search = self.search.query(query).extra(
+            size=0).aggs.metric("scoreDistribution", score_dist_aggs)
+        for score_dist in score_dist_search.execute()["aggregations"]["scoreDistribution"]["buckets"]:
+            score_dist_list.append(
+                {"name": int(score_dist["key"] * 100), "value": score_dist["doc_count"]})
+
+        return score_dist_list
+
