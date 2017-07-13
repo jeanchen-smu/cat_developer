@@ -9,6 +9,8 @@ import GpsFixed from "material-ui/svg-icons/device/gps-fixed";
 import Timer from "material-ui/svg-icons/image/timer";
 import PinDrop from "material-ui/svg-icons/maps/pin-drop";
 import Grade from "material-ui/svg-icons/action/grade";
+import Warning from "material-ui/svg-icons/alert/warning";
+import Redeem from "material-ui/svg-icons/action/redeem";
 
 
 const styles = {
@@ -54,6 +56,20 @@ class LeftDrawer extends React.Component {
 					style={styles.listItem}
 					leftIcon={<Grade color={styles.listIcon.color}/>}
 					containerElement={<Link to={"/home/rank"} />}
+				/>
+				<ListItem
+					key={4}
+					primaryText="Accidents"
+					style={styles.listItem}
+					leftIcon={<Warning color={styles.listIcon.color}/>}
+					containerElement={<Link to={"/home/accident"} />}
+				/>
+				<ListItem
+					key={5}
+					primaryText="Offer"
+					style={styles.listItem}
+					leftIcon={<Redeem color={styles.listIcon.color}/>}
+					containerElement={<Link to={"/home/offer"} />}
 				/>
 			</List>
 		);

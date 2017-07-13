@@ -116,8 +116,60 @@ def get_past_journeys():
     position_service.get_trips(filter, data)
     return jsonify(data)
 
-
 @app.route('/vehicles', methods=['GET', 'POST'])
 @jwt_required
 def get_vehicles():
     return jsonify(accessible_vehicles)
+
+# Retrieve the months during which a rebate is applicable
+@app.route('/month', methods=['GET', 'POST'])
+@jwt_required
+def get_months():
+    data = ["May 2017", "June 2017", "Current"]
+    return jsonify(data)
+
+@app.route('/monthly_discount', methods=['GET', 'POST'])
+@jwt_required
+def get_monthly_discount():
+    month = request.json.get('month')
+    print('selected month is ' + month)
+    if month == 'May 2017':
+        data = {
+            "claims": 0,
+            "mileage": 2000,
+            "score": 0.90,
+            "crossSell": 1,
+            "pilotProgram": 1,
+            "rebate": 350
+        }
+    elif month == 'June 2017':
+        data = {
+            "claims": 1,
+            "mileage": 1800,
+            "score": 0.92,
+            "crossSell": 1,
+            "pilotProgram": 1,
+            "rebate": 437.5
+        }
+    elif month == 'Current': 
+        data = {
+            "claims": 0,
+            "mileage": 900,
+            "score": 0.95,
+            "crossSell": 1,
+            "pilotProgram": 1,
+            "rebate": 437.5
+        }
+    else:
+        data = {
+            "claims": 0,
+            "mileage": 900,
+            "score": 0.95,
+            "crossSell": 1,
+            "pilotProgram": 1,
+            "rebate": 437.5
+        }
+    return jsonify(data)
+
+
+
