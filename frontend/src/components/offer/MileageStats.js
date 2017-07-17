@@ -20,7 +20,7 @@ const styles = {
     }
 };
 
-class ScoringStats extends React.Component {
+class MileageStats extends React.Component {
     constructor(props) {
         super(props);
         this.state = this.getDefaultState();
@@ -29,8 +29,8 @@ class ScoringStats extends React.Component {
     getDefaultState() {
         return {
             graphData: {
-                scoreDistribution: [], //score distribution for the selected month
-                averageScore: [] //average score over time
+                distanceDistribution: [],
+                averageDistance: []
             }
         };
     }
@@ -38,7 +38,7 @@ class ScoringStats extends React.Component {
     getStatistics() {
         var reqObj = {
             method: "post",
-            url: "/api/score",
+            url: "/api/mileage",
             headers:{
 				"Content-Type": "application/json",
 				Authorization: "Bearer " + localStorage.getItem("access_token")            
@@ -49,6 +49,7 @@ class ScoringStats extends React.Component {
         };
         axios(reqObj)
             .then(resp => {
+                console.log(resp.data);
                 this.setState({ graphData: resp.data });
             })
             .catch(err => {
@@ -66,27 +67,27 @@ class ScoringStats extends React.Component {
 
     render() {
         return (
-            <Card style = {styles.card}>
+            <Card style={styles.card}>
                 <CardHeader
-                    title="Driving Score Statistics"
+                    title="Mileage Statistics"
                     actAsExpander={true}
                     showExpandableButton={true}
                 />
                 <CardText expandable={true}>
                     <Tabs>
-                        <Tab label="Score Distribution">
+                        {/* <Tab label="Mileage Distribution">
                             <FMBarChart
                                 headerColor={orange600}
-                                title="Vehicle Score Distribution"
-                                data={this.state.graphData.scoreDistribution}
+                                title="Driving Distance Distribution"
+                                data={this.state.graphData.distanceDistribution}
                                 color={blue600}
                             />
-                        </Tab>
-                        <Tab label="Average Score">
+                        </Tab> */}
+                        <Tab label="Average Distance">
                             <FMLineChart
                                 headerColor={pink600}
-                                title="Average Driving Score"
-                                data={this.state.graphData.averageScore}
+                                title="Average Driving Distance"
+                                data={this.state.graphData.averageDistance}
                                 color={purple600}
                             />
                         </Tab>
@@ -97,4 +98,4 @@ class ScoringStats extends React.Component {
     }
 }
 
-export default ScoringStats;
+export default MileageStats;
