@@ -49,7 +49,6 @@ class MileageStats extends React.Component {
         };
         axios(reqObj)
             .then(resp => {
-                console.log(resp.data);
                 this.setState({ graphData: resp.data });
             })
             .catch(err => {

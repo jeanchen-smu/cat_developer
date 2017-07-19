@@ -48,7 +48,6 @@ class MonthlyDiscount extends React.Component {
         };
         axios(reqObj)
             .then(resp => {
-                console.log(resp.data)
                 this.setState({
                     claims: resp.data.claims,
                     mileage: resp.data.mileage,

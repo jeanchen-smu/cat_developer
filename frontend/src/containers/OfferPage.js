@@ -60,11 +60,10 @@ class OfferPage extends React.Component {
 
     handleMonthChange(event, index, value) {
         this.setState( {month: value} );
-        console.log("Month updated to " +  this.state.month);
     }
 
     render() {
-        let month = this.state.month;
+        const month = this.state.month;
         
         return (
             <PageBase title="Discount" navigation="Application / Offer">
