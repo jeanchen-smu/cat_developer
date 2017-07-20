@@ -62,7 +62,7 @@ class LeftDrawer extends React.Component {
 					primaryText="Accidents"
 					style={styles.listItem}
 					leftIcon={<Warning color={styles.listIcon.color}/>}
-					containerElement={<Link to={"/home/accident"} />}
+					containerElement={<Link to={"/home/accidentanalysis"} />}
 				/>
 				<ListItem
 					key={5}

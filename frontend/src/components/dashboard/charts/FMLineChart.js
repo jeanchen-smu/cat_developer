@@ -18,8 +18,8 @@ const FMLineChart = props => {
             marginLeft: "auto",
             marginRight: "auto",
             width: "90%",
-            height: 500,
-            paddingTop: 40,
+            height: 300,
+            paddingTop: 20,
             paddingBottom: 20
         },
         header: {
@@ -32,7 +32,7 @@ const FMLineChart = props => {
     };
 
     return (
-        <Paper>
+        <Paper zDepth={0}>
             {/*<div style={{...styles.header}}>{props.title}</div>*/}
             <div style={styles.div}>
                 <ResponsiveContainer>
