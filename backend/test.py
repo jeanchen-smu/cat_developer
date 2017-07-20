@@ -1,22 +1,37 @@
-# from service.vehicle_score_service import VehicleScoreService
+from config.config_helper import ConfigHelper
+from elasticsearch import Elasticsearch, RequestsHttpConnection
+from elasticsearch.helpers import scan, bulk
+from requests_aws4auth import AWS4Auth
+from elasticsearch_dsl import Search
 
-# vehicle_score_service = VehicleScoreService()
+es = es_search =  None
+def init_es():
+        config_helper = ConfigHelper()
 
-# print vehicle_score_service.get_stats("2017-06-29", "2017-06-29",None)
+        es_params = config_helper.get_es_params()
+        index = es_params['Index']
+        doc_type = 'POSITION'
 
-# def to_date(date_string):
-#     return date_string.split("T")[0]
+        if es_params['Host'] == 'localhost':
+                es = Elasticsearch()
+        else:
+                es = Elasticsearch(
+                        hosts=[{'host': es_params['Host'], 'port': es_params['Port']}],
+                        http_auth=AWS4Auth(
+                                es_params['AccessKeyID'], es_params['AccessKey'], es_params['Region'], 'es'),
+                        use_ssl=True,
+                        verify_certs=True,
+                        timeout = 5*60,
+                        connection_class=RequestsHttpConnection
+                )
+        es_search = Search(using=es, index=index,
+                        doc_type=doc_type)
 
-# print to_date()
 
-filter = {
-        'start_date': "2017-06-22",
-        'end_date': "2017-06-22",
-        'vehicle_list': [29875, 29873]
-        }
+init_es()
 
-from service.position_service import PositionService
 
-position_service = PositionService()
+es.
 
-print position_service.get_trips(filter)
+
+
