@@ -116,8 +116,74 @@ def get_past_journeys():
     position_service.get_trips(filter, data)
     return jsonify(data)
 
-
 @app.route('/vehicles', methods=['GET', 'POST'])
 @jwt_required
 def get_vehicles():
     return jsonify(accessible_vehicles)
+
+# Retrieve the months during which a rebate is applicable
+@app.route('/month', methods=['GET', 'POST'])
+@jwt_required
+def get_months():
+    data = ["June 2017", "July 2017"]
+    return jsonify(data)
+
+@app.route('/monthly_discount', methods=['GET', 'POST'])
+@jwt_required
+def get_monthly_discount():
+    month = request.json.get('month')
+    if month == 'June 2017':
+        data = {
+            "claims": 1,
+            "mileage": 2487.02,
+            "score": 0.87,
+            "crossSell": 1,
+            "pilotProgram": 1,
+            "rebate": 437.5
+        }
+    elif month == 'July 2017': 
+        data = {
+            "claims": 0,
+            "mileage": 700,
+            "score": 0.88,
+            "crossSell": 1,
+            "pilotProgram": 1,
+            "rebate": 437.5
+        }
+    else:
+        data = {
+            "claims": 0,
+            "mileage": 700,
+            "score": 0.88,
+            "crossSell": 1,
+            "pilotProgram": 1,
+            "rebate": 437.5
+        }
+    return jsonify(data)
+
+@app.route('/score', methods=['GET', 'POST'])
+@jwt_required
+def get_scoring_stats():
+    month = request.json.get('month')
+    start_date, end_date = time_helper.convert_month(month)
+    data = {}
+    avg_score_list = vehicle_score_service.get_monthly_score(accessible_vehicles)
+    score_dist_list = vehicle_score_service.get_score_dist(start_date, end_date, accessible_vehicles)
+    data["scoreDistribution"] = score_dist_list
+    data["averageScore"] = avg_score_list
+    return jsonify(data)
+
+@app.route('/mileage', methods=['GET', 'POST'])
+@jwt_required
+def get_mileage_stats():
+    month = request.json.get('month')
+    start_date, end_date = time_helper.convert_month(month)
+    data = {}
+    avg_distance_list = vehicle_score_service.get_monthly_mileage(accessible_vehicles)
+    distance_dist_list = []
+    data["distanceDistribution"] = distance_dist_list
+    data["averageDistance"] = avg_distance_list
+    return jsonify(data)
+
+
+
