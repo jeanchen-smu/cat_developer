@@ -92,7 +92,7 @@ class VehicleDetails extends React.Component {
             <Card style={styles.card}>
                 <CardHeader
                     title="Vehicle Details"
-                    subtitle="Information about the vehicle"
+                    subtitle="Information about the vehicle involved in the accident"
                     actAsExpander={true}
                     showExpandableButton={true}
                 />
