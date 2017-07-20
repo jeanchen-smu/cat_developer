@@ -25,27 +25,21 @@ class AccidentAnalysis extends React.Component {
         filterObj.endDate = end;
         filterObj.vehicleList = [];
         return filterObj;
-	}
-	
-	applyFilter(filterObj) {
-		this.setState({ fiterObj: filterObj });
-	}
+    }
+
+    applyFilter(filterObj) {
+        this.setState({ fiterObj: filterObj });
+    }
 
     render() {
         return (
-            <PageBase
-                title="Detailed analysis of accidents"
-                navigation="Application / Accident Analysis"
-            >
+            <PageBase title="Detailed analysis of accidents" navigation="Application / Accident Analysis">
                 <div>
                     <div>
-                        <FilterDrawer
-                            filterObj={this.state.filterObj}
-                            applyFilter={this.applyFilter.bind(this)}
-                        />
+                        <FilterDrawer filterObj={this.state.filterObj} applyFilter={this.applyFilter.bind(this)} />
                     </div>
                     <div>
-						<VehicleDetails/>
+                        <VehicleDetails />
                         <EventsTimeline />
                     </div>
                 </div>

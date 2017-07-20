@@ -1,21 +1,8 @@
 import React from "react";
 import { Card, CardHeader, CardText } from "material-ui/Card";
-import {
-    ResponsiveContainer,
-    ComposedChart,
-    Area,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend
-} from "recharts";
+import { ResponsiveContainer, ComposedChart, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import axios from "axios";
-import {
-    cyan600,
-    blue600
-} from "material-ui/styles/colors";
+import { cyan600, blue600 } from "material-ui/styles/colors";
 
 const styles = {
     card: {
@@ -105,42 +92,16 @@ class EventsTimeline extends React.Component {
                         <ResponsiveContainer>
                             <ComposedChart
                                 data={this.state.graphData.speedEvents}
-                                margin={{
-                                    top: 5,
-                                    right: 10,
-                                    left: 10,
-                                    bottom: 5
-                                }}
+                                margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
                             >
                                 <XAxis dataKey="name" />
-                                <YAxis
-                                    yAxisId="left"
-                                    orientation="left"
-                                    label="Km/Hr"
-                                    stroke={cyan600}
-                                />
-                                <YAxis
-                                    yAxisId="right"
-                                    orientation="right"
-                                    label="G's"
-                                    stroke={blue600}
-                                />
+                                <YAxis yAxisId="left" orientation="left" label="Km/Hr" stroke={cyan600} />
+                                <YAxis yAxisId="right" orientation="right" label="G's" stroke={blue600} />
                                 <Tooltip />
                                 <Legend />
                                 <CartesianGrid stroke="#f5f5f5" />
-                                <Area
-                                    yAxisId="left"
-                                    type="monotone"
-                                    dataKey="speed"
-                                    fill={cyan600}
-                                    stroke={cyan600}
-                                />
-                                <Bar
-                                    yAxisId="right"
-                                    dataKey="accelG"
-                                    barSize={20}
-                                    fill={blue600}
-                                />
+                                <Area yAxisId="left" type="monotone" dataKey="speed" fill={cyan600} stroke={cyan600} />
+                                <Bar yAxisId="right" dataKey="accelG" barSize={20} fill={blue600} />
                             </ComposedChart>
                         </ResponsiveContainer>
                     </div>
