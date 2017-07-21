@@ -10,6 +10,7 @@ import Timer from "material-ui/svg-icons/image/timer";
 import PinDrop from "material-ui/svg-icons/maps/pin-drop";
 import Grade from "material-ui/svg-icons/action/grade";
 import Warning from "material-ui/svg-icons/alert/warning";
+import Fingerprint from "material-ui/svg-icons/action/fingerprint";
 import Redeem from "material-ui/svg-icons/action/redeem";
 
 
@@ -62,10 +63,17 @@ class LeftDrawer extends React.Component {
 					primaryText="Accidents"
 					style={styles.listItem}
 					leftIcon={<Warning color={styles.listIcon.color}/>}
-					containerElement={<Link to={"/home/accidentanalysis"} />}
+					containerElement={<Link to={"/home/accidents"} />}
 				/>
 				<ListItem
 					key={5}
+					primaryText="Accident Analysis"
+					style={styles.listItem}
+					leftIcon={<Fingerprint color={styles.listIcon.color}/>}
+					containerElement={<Link to={"/home/accidentanalysis"} />}
+				/>
+				<ListItem
+					key={6}
 					primaryText="Offer"
 					style={styles.listItem}
 					leftIcon={<Redeem color={styles.listIcon.color}/>}

@@ -1,11 +1,9 @@
 import React from "react";
 import PageBase from "../components/PageBase";
 import FilterDrawer, { FilterObj } from "../components/filter/FilterDrawer";
-import EventsTimeline from "../components/accidents-claims/analysis/EventsTimeline";
-import VehicleDetails from "../components/accidents-claims/analysis/VehicleDetails";
-//import axios from "axios";
+import ClaimsUploader from "../components/accidents-claims/accidents/ClaimsUploader";
 
-class AccidentAnalysis extends React.Component {
+class AccidentsPage extends React.Component {
     constructor() {
         super();
         this.state = {
@@ -33,14 +31,13 @@ class AccidentAnalysis extends React.Component {
 
     render() {
         return (
-            <PageBase title="Detailed analysis of accidents" navigation="Application / Accident Analysis">
+            <PageBase title="Accidents and claims" navigation="Application / Accidents">
                 <div>
                     <div>
                         <FilterDrawer filterObj={this.state.filterObj} applyFilter={this.applyFilter.bind(this)} />
                     </div>
                     <div>
-                        <VehicleDetails />
-                        <EventsTimeline />
+                        <ClaimsUploader/>
                     </div>
                 </div>
             </PageBase>
@@ -48,4 +45,4 @@ class AccidentAnalysis extends React.Component {
     }
 }
 
-export default AccidentAnalysis;
+export default AccidentsPage;
