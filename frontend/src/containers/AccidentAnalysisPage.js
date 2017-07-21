@@ -4,6 +4,7 @@ import FilterDrawer, { FilterObj } from "../components/filter/FilterDrawer";
 import EventsTimeline from "../components/accidents-claims/analysis/EventsTimeline";
 import VehicleDetails from "../components/accidents-claims/analysis/VehicleDetails";
 import TripRoute from "../components/accidents-claims/analysis/TripRoute";
+import Reconstruction from "../components/accidents-claims/analysis/Reconstruction";
 //import axios from "axios";
 
 class AccidentAnalysisPage extends React.Component {
@@ -43,6 +44,7 @@ class AccidentAnalysisPage extends React.Component {
                         <VehicleDetails filterObj={this.state.filterObj}/>
                         <EventsTimeline filterObj={this.state.filterObj}/>
                         <TripRoute filterObj={this.state.filterObj}/>
+                        <Reconstruction/>
                     </div>
                 </div>
             </PageBase>
