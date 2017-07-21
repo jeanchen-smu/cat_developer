@@ -1,7 +1,9 @@
 import React from "react";
 import PageBase from "../components/PageBase";
+import Divider from 'material-ui/Divider';
 import FilterDrawer, { FilterObj } from "../components/filter/FilterDrawer";
 import ClaimsUploader from "../components/accidents-claims/accidents/ClaimsUploader";
+import AccidentClaimListing from "../components/accidents-claims/accidents/AccidentClaimListing";
 
 class AccidentsPage extends React.Component {
     constructor() {
@@ -38,6 +40,7 @@ class AccidentsPage extends React.Component {
                     </div>
                     <div>
                         <ClaimsUploader/>
+                        <AccidentClaimListing/>
                     </div>
                 </div>
             </PageBase>

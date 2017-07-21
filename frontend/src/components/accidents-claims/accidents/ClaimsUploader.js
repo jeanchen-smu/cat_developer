@@ -1,8 +1,29 @@
 import React from "react";
-import { Card, CardHeader, CardText } from "material-ui/Card";
+import Paper from "material-ui/Paper";
+import Subheader from "material-ui/Subheader";
 import TextField from "material-ui/TextField";
 import RaisedButton from "material-ui/RaisedButton";
 
+const styles = {
+    div:{
+        marginLeft:30,
+        paddingBottom:30
+    }, 
+
+    button: {
+        margin: 12
+    },
+    fileOpen: {
+        cursor: "pointer",
+        position: "absolute",
+        top: 0,
+        bottom: 0,
+        right: 0,
+        left: 0,
+        width: "100%",
+        opacity: 0
+    }
+};
 class ClaimsUploader extends React.Component {
     constructor(props) {
         super(props);
@@ -17,15 +38,21 @@ class ClaimsUploader extends React.Component {
 
     render() {
         return (
-            <Card  expanded={true} style={{marginTop:30, width:"60%"}}>
-                <CardHeader title="Upload Claims File" style={{fontWeight:"normal"}}/>
-                <CardText expandable={true}>
-                    <div>
-                        <TextField hintText="Please select file name" style={{width:"80%"}}/>
-                        <RaisedButton label="Upload" primary={true} style={{ margin: 10 }} />
-                    </div>
-                </CardText>
-            </Card>
+            <Paper>
+                <Subheader>Upload Claims File</Subheader>
+                <div style={styles.div}>
+                    <TextField hintText="Please select file name" style={{ width: 400 }} />
+                    <RaisedButton
+                        primary={true}
+                        label="Upload"
+                        labelPosition="before"
+                        style={styles.button}
+                        containerElement="label"
+                    >
+                        <input type="file" style={styles.fileOpen} />
+                    </RaisedButton>
+                </div>
+            </Paper>
         );
     }
 }
