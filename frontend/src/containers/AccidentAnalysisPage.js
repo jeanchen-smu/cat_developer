@@ -3,6 +3,7 @@ import PageBase from "../components/PageBase";
 import FilterDrawer, { FilterObj } from "../components/filter/FilterDrawer";
 import EventsTimeline from "../components/accidents-claims/analysis/EventsTimeline";
 import VehicleDetails from "../components/accidents-claims/analysis/VehicleDetails";
+import TripRoute from "../components/accidents-claims/analysis/TripRoute";
 //import axios from "axios";
 
 class AccidentAnalysisPage extends React.Component {
@@ -39,8 +40,9 @@ class AccidentAnalysisPage extends React.Component {
                         <FilterDrawer filterObj={this.state.filterObj} applyFilter={this.applyFilter.bind(this)} />
                     </div>
                     <div>
-                        <VehicleDetails />
-                        <EventsTimeline />
+                        <VehicleDetails filterObj={this.state.filterObj}/>
+                        <EventsTimeline filterObj={this.state.filterObj}/>
+                        <TripRoute filterObj={this.state.filterObj}/>
                     </div>
                 </div>
             </PageBase>

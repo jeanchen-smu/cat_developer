@@ -2,7 +2,6 @@ import React, { PropTypes } from "react";
 import LocationMap from "./LocationMap";
 import axios from "axios";
 import "leaflet/dist/leaflet.css";
-//import Data from "../../data";
 
 class Realtime extends React.Component {
     constructor(props) {
