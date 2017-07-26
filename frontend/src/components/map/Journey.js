@@ -37,7 +37,7 @@ class Journey extends React.Component {
 
         return (
             <div>
-                <Polyline weight={5} positions={latlngList}>
+                <Polyline weight={3} positions={latlngList}>
                     <Popup>
                         <p>
                             <b>Vehicle: </b>{vehicle}

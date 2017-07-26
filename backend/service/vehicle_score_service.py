@@ -29,13 +29,13 @@ class VehicleScoreService(VehicleScoreTable):
         score_query = Q("constant_score", filter=date_filter+dist_filter+score_filter)
 
         group_aggs = A("terms", field="VehicleID", order={"AvgScore": "desc"}, size=3000)
-        avg_overspeed_aggs = A("avg", field="MaxSpeed")
+        avg_maxspeed_aggs = A("avg", field="MaxSpeed")
         avg_score_aggs = A("avg", field="Score")
         avg_time_aggs = A("avg", field="EstimatedDrivingTime")
         avg_dist_aggs = A("avg", field="EstimatedDrivingDistance")
 
         score_search = self.search.query(score_query).aggs.metric("GroupByVehicle", group_aggs)
-        score_search.aggs["GroupByVehicle"].metric("AvgMaxOverspeed", avg_overspeed_aggs)
+        score_search.aggs["GroupByVehicle"].metric("AvgMaxSpeed", avg_maxspeed_aggs)
         score_search.aggs["GroupByVehicle"].metric("AvgScore", avg_score_aggs)
         score_search.aggs["GroupByVehicle"].metric("AvgTime", avg_time_aggs)
         score_search.aggs["GroupByVehicle"].metric("AvgDistance", avg_dist_aggs)
@@ -48,7 +48,7 @@ class VehicleScoreService(VehicleScoreTable):
                 "Vehicle ID": rank["key"],
                 "Kind": "--",
                 "Score": round(rank["AvgScore"]["value"]*100, 2),
-                "Max Overspeed": round(rank["AvgMaxOverspeed"]["value"], 2),
+                "Max Speed": round(rank["AvgMaxSpeed"]["value"], 2),
                 "Driving Time": round(rank["AvgTime"]["value"], 2),
                 "Distance": round(rank["AvgDistance"]["value"], 2)
             })

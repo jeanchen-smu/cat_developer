@@ -18,7 +18,7 @@ const columns = [
     "Vehicle ID",
     "Kind",
     "Score",
-    "Max Overspeed",
+    "Max Speed",
     "Driving Time",
     "Distance"
 ];
@@ -44,7 +44,7 @@ const styles = {
             Score: {
                 width: "10%"
             },
-            "Max Overspeed": {
+            "Max Speed": {
                 width: "10%"
             },
             "Driving Time": {
