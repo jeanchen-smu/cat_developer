@@ -97,7 +97,7 @@ class Kpi extends React.Component {
                                 Icon={SwapCalls}
                                 color={cyan600}
                                 title="Total Distance"
-                                value={this.state.totalDistance.toFixed(2) + " km"}
+                                value={this.state.totalDistance.toFixed(0) + " km"}
                             />
                         </div>
 
@@ -115,7 +115,7 @@ class Kpi extends React.Component {
                                 Icon={Gesture}
                                 color={orange600}
                                 title="Longest Ride Distance"
-                                value={this.state.longestRideDistance.toFixed(2) + " km"}
+                                value={this.state.longestRideDistance.toFixed(0) + " km"}
                             />
                         </div>
 
