@@ -125,7 +125,7 @@ def get_vehicles():
 @app.route('/month', methods=['GET', 'POST'])
 @jwt_required
 def get_months():
-    data = ["June 2017", "July 2017"]
+    data = ["June 2017"]
     return jsonify(data)
 
 @app.route('/monthly_discount', methods=['GET', 'POST'])
@@ -185,5 +185,29 @@ def get_mileage_stats():
     data["averageDistance"] = avg_distance_list
     return jsonify(data)
 
+@app.route('/accident', methods=['GET', 'POST'])
+@jwt_required
+def get_accidents():
+    filter = {
+        'start_date': to_date(request.json.get('startDate')),
+        'end_date': to_date(request.json.get('endDate')),
+        'vehicle_list': request.json.get('vehicleList')
+    }
+    data = {}
+    coordinates = {}
 
-
+    vehicle = filter['vehicle_list'][0]
+    position_service.get_trips(filter, coordinates)
+    data["coordinates"] = coordinates.get(vehicle)
+    data["events"] = {
+        "Harsh Braking": [
+            {
+                "Lat": 1.371912490015,
+                "Long": 103.89906305231,
+                "DeviceTS": "2017-07-19 15:59:54",
+                "Speed": 1 
+            }
+        ],
+        "Harsh Acceleration": []
+    }
+    return jsonify(data)

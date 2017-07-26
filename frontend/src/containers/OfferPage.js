@@ -9,7 +9,7 @@ import MenuItem from 'material-ui/MenuItem';
 import axios from 'axios';
 
 const months = [
-    'July 2017'
+    'June 2017'
 ];
 
 class OfferPage extends React.Component {
@@ -20,7 +20,7 @@ class OfferPage extends React.Component {
 
     getDefaultState() {
         return {
-            month: 'July 2017',
+            month: 'June 2017',
             allMonths: months
         };
     }
