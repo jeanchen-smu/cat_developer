@@ -21,9 +21,9 @@ function requireAuth(nextState, replace) {
 
 export default (
     <Route>
-        <Route path="/" component={LoginPage} />
-        <Route path="/login" component={LoginPage} />
-        <Route path="/home" component={App}>
+        <Route path="/cat" component={LoginPage} />
+        <Route path="/cat/login" component={LoginPage} />
+        <Route path="/cat/home" component={App}>
             <IndexRoute component={Dashboard} />
             <Route path="dashboard" component={Dashboard} />
             <Route path="post" component={PostPage}/>
