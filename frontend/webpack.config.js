@@ -14,7 +14,7 @@ var config = {
   target: 'web',
   output: {
     path: '/usr/local/Cellar/nginx/1.12.0_1/html/',
-    publicPath: '/',
+    publicPath: '/cat/',
     filename: 'bundle.js'
   },
   plugins: [
