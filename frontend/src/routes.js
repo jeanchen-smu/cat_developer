@@ -4,11 +4,8 @@ import App from "./containers/App";
 import NotFoundPage from "./containers/NotFoundPage.js";
 import LoginPage from "./containers/LoginPage";
 import Dashboard from "./containers/DashboardPage";
-import RankPage from "./containers/RankPage";
-import TrackingPage from "./containers/TrackingPage";
-import OfferPage from "./containers/OfferPage";
-import AccidentAnalysisPage from "./containers/AccidentAnalysisPage";
-import AccidentsPage from "./containers/AccidentsPage";
+import Forum from "./containers/Forum";
+import PostPage from "./containers/PostPage"
 
 function loggedIn() {
     return localStorage.getItem("access_token") != null;
@@ -26,14 +23,10 @@ export default (
     <Route>
         <Route path="/" component={LoginPage} />
         <Route path="/login" component={LoginPage} />
-        <Route path="/home" component={App} onEnter={requireAuth}>
+        <Route path="/home" component={App}>
             <IndexRoute component={Dashboard} />
             <Route path="dashboard" component={Dashboard} />
-            <Route path="tracking" component={TrackingPage} />
-            <Route path="rank" component={RankPage} />
-            <Route path="offer" component={OfferPage} />
-            <Route path="accidents" component={AccidentsPage} />
-            <Route path="accidentanalysis" component={AccidentAnalysisPage} />
+            <Route path="post" component={PostPage}/>
             <Route path="*" component={NotFoundPage} />
         </Route>
     </Route>

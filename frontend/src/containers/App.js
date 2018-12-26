@@ -4,42 +4,47 @@ import Header from '../components/Header';
 import LeftDrawer from '../components/LeftDrawer';
 import withWidth, {LARGE, SMALL} from 'material-ui/utils/withWidth';
 import ThemeDefault from '../theme-default';
-import Data from '../data';
+import { connect } from "react-redux";
+import { NavOpen,
+         NavReceiveProps} from "./../actions/navAction";
+import {GetMyStats} from "./../actions/statAction";
 
 class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {
-      navDrawerOpen: false
-    };
   }
 
   componentWillReceiveProps(nextProps) {
     if (this.props.width !== nextProps.width) {
-      this.setState({navDrawerOpen: nextProps.width === LARGE});
+       this.props.navReceiveProps(nextProps.width === LARGE);
     }
   }
 
   handleChangeRequestNavDrawer() {
-    this.setState({
-      navDrawerOpen: !this.state.navDrawerOpen
-    });
+    if (this.props.nav.navOpen == false){
+      this.props.getMyStats(
+        sessionStorage.getItem("access_token"),
+        sessionStorage.getItem("userId"),
+        this.props.section_id
+        );
+    }
+    this.props.navOpen();
   }
 
   render() {
-    let { navDrawerOpen } = this.state;
-    const paddingLeftDrawerOpen = 236;
+    const paddingLeftDrawerOpen = 300;
 
     const styles = {
       header: {
-        paddingLeft: navDrawerOpen ? paddingLeftDrawerOpen : 0
+        paddingRight: this.props.nav.navOpen ? paddingLeftDrawerOpen : 0
       },
       container: {
         margin: '80px 20px 20px 15px',
-        paddingLeft: navDrawerOpen && this.props.width !== SMALL ? paddingLeftDrawerOpen : 0
+        paddingRight: this.props.nav.navOpen && this.props.width !== SMALL ? paddingLeftDrawerOpen : 0
       }
     };
+
 
     return (
       <MuiThemeProvider muiTheme={ThemeDefault}>
@@ -47,9 +52,7 @@ class App extends React.Component {
           <Header styles={styles.header}
                   handleChangeRequestNavDrawer={this.handleChangeRequestNavDrawer.bind(this)}/>
 
-            <LeftDrawer navDrawerOpen={navDrawerOpen}
-                        menus={Data.menus}
-                        username="User Admin"/>
+            <LeftDrawer />
 
             <div style={styles.container}>
               {this.props.children}
@@ -65,4 +68,27 @@ App.propTypes = {
   width: PropTypes.number
 };
 
-export default withWidth()(App);
+const mapStateToProps = (state) => {
+  return {
+	  login: state.login.login,
+    user: state.login.user,
+    nav: state.nav,
+    section_id: state.login.user.section_id
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        navOpen: () => {
+          dispatch(NavOpen())
+        },
+        navReceiveProps: (bol) => {
+          dispatch(NavReceiveProps(bol))
+        },
+        getMyStats: (access_token, userId, section_id) => {
+          dispatch(GetMyStats(access_token, userId, section_id))
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withWidth()(App));

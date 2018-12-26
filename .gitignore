@@ -1,3 +1,0 @@
-*.pyc
-backend/deploy/lambda/*
-frontend/node_modules/*

@@ -1,53 +1,223 @@
 import React from "react";
-import Statistics from "../components/dashboard/Statistics";
-import Kpi from "../components/dashboard/KPI";
-import GeoVisualization from "../components/dashboard/GeoVisualization";
-import PageBase from "../components/PageBase";
-import FilterDrawer, { FilterObj } from "../components/filter/FilterDrawer";
+import Forum from "./Forum";
+import QuestionPaper from "../components/postPage/questionPaper";
+import Paper from "material-ui/Paper";
+import globalStyles from '../styles';
+import NewPost from "./../components/forumPage/newPost";
+import RaisedButton from 'material-ui/RaisedButton';
+import Divider from 'material-ui/Divider';
+import {connect} from 'react-redux';
+import {SetPost, GetTopics, CloseSearch, UpdateTopic, GetPosts, GetSessions, UpdateSection} from "./../actions/forumAction";
+import {SetQaCoins, ResetQaCoins, SetDate, SetDateTime} from "./../actions/newPostAction";
+import moment from "moment";
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
+import axios from "axios";
 
 class DashboardPage extends React.Component {
-    constructor() {
+    constructor(){
         super();
-        this.state = { filterObj: this.defaultFilter(7,1) };
+        this.styles = {
+            newPostPaper: {
+                ...globalStyles.paper,
+                marginTop: 10,
+                paddingBottom: 65
+            },
+            newPostButton:{
+                float: "right"
+            }
+        };
     }
 
-    defaultFilter(startOffset, endOffset) {
-        let start = new Date();
-        start.setDate(start.getDate() - startOffset);
-        
-        let end = new Date();
-        end.setDate(end.getDate() - endOffset);
-        
-        let filterObj = new FilterObj();
-        filterObj.startDate = start;
-        filterObj.endDate = end;
-        filterObj.vehicleList = [];
-        return filterObj;
+    routeToNewPost() {
+        if (document.getElementById("newPostTitle")) {
+            document.getElementById("newPostTitle").focus()
+        }
     }
 
-    applyFilter(filterObj) {
-        this.setState({ filterObj: filterObj });
+    tagMenuItems(tags) {
+        return tags.map((tag) => (
+        <MenuItem
+            key={tag.tag_id}
+            value={tag.tag_id}
+            primaryText={tag.tag}
+        />
+        ));
     }
+
+    topicMenuItem(topic) {
+        return (
+            <MenuItem
+                key={topic.topic_id}
+                value={topic.topic_id}
+                primaryText={topic.topic}
+            />
+        );
+    }
+
+    // sessionMenuItem(session) {
+    //     return (
+    //         <MenuItem
+    //             key={session.section_id}
+    //             value={session.section_id}
+    //             primaryText={session.section_id}
+    //         />
+    //     )
+    // }
+
+    handleTopicChange(event, index, value) {
+        this.props.updateTopic({value}.value);
+        this.props.getPosts(
+            sessionStorage.getItem("access_token"),
+            {
+                topic_id: {value}.value,
+                section_id: this.props.section_id,
+                userId: this.props.userId
+            }
+        )
+    }
+
+    // handleSectionChange(event, index, value) {
+    //     this.props.updateSection({value}.value);
+    //     this.props.getPosts(
+    //         sessionStorage.getItem("access_token"),
+    //         {
+    //             topic_id: this.props.topic,
+    //             section_id: {value}.value,
+    //             userId: this.props.userId
+    //         }
+    //     )
+    // }
 
     render() {
         return (
-            <PageBase title="Overview" navigation="Application / Overview">
+            <div>
+            <Paper style={globalStyles.paper}>
+                <h3 style={globalStyles.title}>
+                    Discussion
+                    <div style={this.styles.newPostButton}>
+                    <RaisedButton 
+                        label="Search"
+                        style={{marginRight:20}}
+                        secondary={true}
+                        onClick={()=>{
+                            if(!this.props.search){
+                                this.props.getTopics(sessionStorage.getItem("access_token"))
+                                // this.props.getSessions(sessionStorage.getItem("access_token"),
+                                // this.props.userId)
+                            }
+                            else{
+                                this.props.closeSearch()
+                            }
+                        }}
+                    />
+    
+                    <RaisedButton 
+                        label="New Post"
+                        secondary={true}
+                        onClick={this.routeToNewPost.bind(this)}    
+                    />
+                    </div>
+                </h3>
+                {this.props.search?
                 <div>
-                    <div>
-                        <Kpi filterObj={this.state.filterObj} />
-                        <Statistics filterObj={this.state.filterObj} />
-                        <GeoVisualization filterObj={this.state.filterObj} />
-                    </div>
-                    <div>
-                        <FilterDrawer
-                            filterObj={this.state.filterObj}
-                            applyFilter={this.applyFilter.bind(this)}
-                        />
-                    </div>
-                </div>
-            </PageBase>
+                    <br />
+                    <Paper style={{paddingLeft: 20}}>
+                        <SelectField
+                            hintText="Search By Topic"
+                            value={this.props.topic}
+                            onChange={this.handleTopicChange.bind(this)}
+                            style={{marginRight:50}}
+                        >
+                            <MenuItem
+                                key={0}
+                                value={0}
+                                primaryText="NONE"
+                            />
+                            {this.props.topics.map(this.topicMenuItem, this)}
+                        </SelectField>
+                        {/* {
+                            this.props.isTeacher?
+                            <SelectField
+                                hintText="Search By Section"
+                                value={this.props.session}
+                                onChange={this.handleSectionChange.bind(this)}
+                            >
+                                <MenuItem
+                                    key={0}
+                                    value={0}
+                                    primaryText="NONE"
+                                />
+                                {this.props.sessions.map(this.sessionMenuItem, this)}
+                            </SelectField>:null
+                        } */}
+                        
+                    </Paper>
+                </div>:null
+                }
+                <Divider />
+                <Forum />
+            </Paper>
+            <Paper style={this.styles.newPostPaper}>
+                <h3 style={globalStyles.title}>New Post</h3>
+                <NewPost />
+            </Paper>
+            </div>
         );
     }
 }
 
-export default DashboardPage;
+const mapStateToProps = (state) => {
+  return {
+      stat: state.stat.stat,
+      newPost: state.newPost,
+      userId: state.login.user.userId,
+      topics: state.forum.topics,
+    //   sessions: state.forum.sessions,
+      search: state.forum.search,
+      topic: state.forum.filter.topic_id,
+    //   session: state.forum.filter.session,
+      section_id: state.login.user.section_id,
+      isTeacher: state.login.user.is_teacher
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+	setPost: (access_token, filter, post) => {
+        dispatch(SetPost(access_token, filter,post))
+    },
+    setQaCoins: (qacoins) => {
+        dispatch(SetQaCoins(qacoins))
+    },
+    resetQaCoins: () => {
+        dispatch(ResetQaCoins())
+    },
+    setDate: (date) => {
+        dispatch(SetDate(date))
+    },
+    setDateTime: (dateTime) => {
+        dispatch(SetDateTime(dateTime))
+    },
+    getTopics: (access_token) => {
+        dispatch(GetTopics(access_token))
+    },
+    getSessions: (access_token, userId) => {
+        dispatch(GetSessions(access_token, userId))
+    },
+    closeSearch: () => {
+        dispatch(CloseSearch())
+    },
+    updateTopic: (topic) => {
+        dispatch(UpdateTopic(topic))
+    },
+    updateSection: (section) => {
+        dispatch(UpdateSection(section))
+    },
+    getPosts: (access_token, filter) => {
+        dispatch(GetPosts(access_token, filter))
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(DashboardPage);

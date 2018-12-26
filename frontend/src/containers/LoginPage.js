@@ -4,13 +4,22 @@ import Paper from "material-ui/Paper";
 import RaisedButton from "material-ui/RaisedButton";
 import FlatButton from "material-ui/FlatButton";
 import Checkbox from "material-ui/Checkbox";
-import { grey800, white } from "material-ui/styles/colors";
+import { grey800, white, blue400 } from "material-ui/styles/colors";
 import Help from "material-ui/svg-icons/action/help";
 import TextField from "material-ui/TextField";
 import { Link } from "react-router";
 import ThemeDefault from "../theme-default";
 import axios from "axios";
 import { browserHistory } from 'react-router';
+import store from "./../store";
+import {GetLoginInfo,
+        ValidateUserName,
+        ValidatePassword} from "./../actions/loginAction";
+import { connect } from "react-redux";
+import { GoogleLogin, GoogleLogout } from 'react-google-login';
+import NewUserDialog from "./../components/loginPage/newUserDialog";
+import {typography} from 'material-ui/styles';
+import Divider from 'material-ui/Divider';
 
 const styles = {
     page: {
@@ -75,71 +84,51 @@ const styles = {
     },
     btnSpan: {
         marginLeft: 5
+    },
+    title: {
+        fontSize: 20,
+        fontWeight: typography.fontWeightMedium,
+        marginBottom: 15,
+        marginTop: 15
     }
 };
 
 class LoginPage extends React.Component {
     constructor() {
         super();
-        this.state = {
-            username: "",
-            password: "",
-            uname_error_msg: "",
-            pwd_error_msg: ""
-        };
     }
 
-    updateVals(event, val) {
-        this.setState({ [event.target.name]: val, uname_error_msg:"", pwd_error_msg:"" });
+    checkUserName() {
+        this.props.validateName(this.refs.username.getValue())
     }
 
+    checkPassword() {
+        this.props.validatePwd(this.refs.password.getValue())
+    }
+	
     validate() {
         var valid = true;
-        if (this.state.username === "") {
-            this.setState({ uname_error_msg: " " });
+        if (this.refs.username.getValue() === "") {
             valid = false;
         }
 
-        if (this.state.password === "") {
-            this.setState({ pwd_error_msg: " " });
+        if (this.refs.password.getValue() === "") {
             valid = false;
         }
         return valid;
     }
-    getRequestObj() {
-        return {
-            method: "post",
-            url: "/api/login",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            data: {
-                username: this.state.username,
-                password: this.state.password
-            }
-        };
-    }
-	
-	login(access_token){
-		localStorage.setItem("access_token", access_token);
-		browserHistory.push("/home");
-	}
-
-	refuse(msg){
-        this.setState({ uname_error_msg: msg });
-        this.setState({ pwd_error_msg: msg });
-	}
 
     handleLogin() {
         if (!this.validate()) return;
+        this.props.getLoginInfo(
+            this.refs.username.getValue(),
+            this.refs.password.getValue());
+    }
 
-        axios(this.getRequestObj())
-            .then(resp => {
-				this.login(resp.data.access_token);
-            })
-            .catch(err => {
-				this.refuse(" ");
-            });
+    responseGoogle = (response) => {
+        this.props.getLoginInfo(
+            response.profileObj.email
+        )
     }
 
     render() {
@@ -148,43 +137,31 @@ class LoginPage extends React.Component {
                 <div style={styles.page}>
                     <div style={styles.loginContainer}>
                         <Paper style={styles.paper}>
-                            <div>
-                                <TextField
-                                    name="username"
-                                    hintText="Username"
-                                    floatingLabelText="Username"
-                                    errorText={this.state.uname_error_msg}
-                                    onChange={this.updateVals.bind(this)}
-                                    fullWidth={true}
+                            <div style={styles.buttonsDiv}>
+                            <h2 style={styles.title}>
+                                WELCOME TO CAT FORUM
+                            </h2>
+                            </div>
+                            <Divider/>
+                            <div style={{...styles.buttonsDiv, marginTop: 50}}>
+                            <GoogleLogin
+                                clientId="6749461762-p7ljlku3v0k1j42m4f2inj7htqfsbnfe.apps.googleusercontent.com"
+                                buttonText="LOGIN"
+                                onSuccess={this.responseGoogle}
+                                onFailure={this.responseGoogle}
+                            />
+                            </div>
+                            <div style={styles.buttonsDiv}>
+                                <FlatButton
+                                    label="Please login with smu email"
+                                    style={styles.flatButton}
+                                    icon={<Help />}
                                 />
-                                <TextField
-                                    name="password"
-                                    hintText="Password"
-                                    floatingLabelText="Password"
-                                    errorText={this.state.pwd_error_msg}
-                                    onChange={this.updateVals.bind(this)}
-                                    fullWidth={true}
-                                    type="password"
-                                />
-                                <div>
-                                    <RaisedButton
-                                        type="submit"
-                                        onTouchTap={this.handleLogin.bind(this)}
-                                        label="Login"
-                                        primary={true}
-                                        style={styles.loginBtn}
-                                    />
-                                </div>
                             </div>
                         </Paper>
-
-                        <div style={styles.buttonsDiv}>
-                            <FlatButton
-                                label="Forgot Password?"
-                                style={styles.flatButton}
-                                icon={<Help />}
-                            />
-                        </div>
+                            
+                        <NewUserDialog />
+                        
                     </div>
                 </div>
             </MuiThemeProvider>
@@ -192,4 +169,25 @@ class LoginPage extends React.Component {
     }
 }
 
-export default LoginPage;
+const mapStateToProps = (state) => {
+  return {
+	  login: state.login.login,
+      user: state.login.user
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        getLoginInfo: (username, password) => {
+            dispatch(GetLoginInfo(username, password))
+        },
+        validateName: (name) => {
+            dispatch(ValidateUserName(name))
+        },
+        validatePwd: (password) => {
+            dispatch(ValidatePassword(password))
+        }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);

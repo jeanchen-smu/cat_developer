@@ -1,213 +1,202 @@
 from flask import Flask, jsonify, request
 from flask_jwt_extended import JWTManager, jwt_required,\
     create_access_token, get_jwt_identity
-from service.vehicle_service import VehicleService
-from service.position_service import PositionService
-from service.vehicle_score_service import VehicleScoreService
-from utils.time_helper import TimeHelper
-from provider.data_helper import Baseride
-import pdb
+import random
+import pickle
+import time
+from services.PostService import Post 
+
+post = Post()
 
 app = Flask(__name__)
 app.secret_key = "JWT SECRET"
 jwt = JWTManager(app)
 
-vehicle_service = VehicleService()
-position_service = PositionService()
-vehicle_score_service = VehicleScoreService()
-time_helper = TimeHelper()
-baseride = Baseride()
-accessible_vehicles = vehicle_service.vehicle_ids()
+def gen_tags():
+    tags=[]
+    for i in range(random.randint(1, 6)):
+        tags.append({
+            "key": i, 
+            "label": 'tag{}'.format(i)
+        })
+    return tags
 
-
-def to_date(utc_string):
-    return time_helper.convert_local_date(utc_string)
-
+def process_string(string):
+    return string.replace("'", "\\'")
 
 @app.route("/login", methods=["POST"])
 def login():
-    username = request.json.get('username')
-    password = request.json.get('password')
-
-    if username == 'goldbell' and password == '1234':
+    email = request.json.get('email')
+    username = email.split("@")[0]
+    user_info = post.get_user_login(username)
+    is_teacher = False
+    if len(user_info) > 0:
         token = create_access_token(username)
-        return jsonify(access_token=token, msg="Success"), 200
+        try:
+            int(username[-4:])
+        except:
+            is_teacher = True
+        return jsonify(access_token=token,
+                         msg="Success", 
+                         is_teacher=is_teacher, 
+                         userId=user_info[0]['avatar_id'],
+                         section_id=user_info[0]['section_id'],
+                         email=user_info[0]['email'],
+                         username=user_info[0]['avatar_name'],
+                         userSections=post.get_sessions(user_info[0]['avatar_id']),
+                         agreed=True if user_info[0]['agreed']=="1" else False ), 200
 
     return jsonify(access_token="", msg="Bad username or password"), 401
 
+@app.route('/stat', methods=['POST'])
+@jwt_required
+def get_user_stat():
+    user_id = request.json.get('userId')
+    section_id = request.json.get('section_id')
+    print section_id
+    data = post.get_user_stat(user_id, section_id)
+    return jsonify(data)
+
+@app.route('/posts', methods=['POST'])
+@jwt_required
+def get_posts():
+    filter = request.json.get('filter')
+    return jsonify(post.getPosts(filter))
+
+@app.route('/question', methods=['POST'])
+@jwt_required
+def get_question():
+    key = request.json.get('questionId')
+    user_id = request.json.get('userId')
+    data = post.get_post(user_id, key)
+    data['question']['isUser'] = (data['question']['userId']==user_id)
+    return jsonify(data)
+
+@app.route('/get_tags', methods=['POST'])
+@jwt_required
+def get_tags():
+    post_id = request.json.get('post_id')
+    return jsonify(post.get_all_tags(post_id))
+
+@app.route('/setpost', methods=['POST'])
+@jwt_required
+def set_post():
+    post_detail = request.json.get('post')
+    filter = request.json.get('filter')
+    post_detail['subject'] = process_string(post_detail['subject'])
+    post_detail['question'] = process_string(post_detail['question'])
+    if not post_detail['edit']:
+        post.delete_abandoned_post(post_detail['previous_post_id'])
+        post_detail['previous_post_id'] = "null"
+    post_id = post.newPost(post_detail)
+    user_id = post_detail["userId"]
+    data = post.get_post(user_id, post_id)
+    data['question']['isUser'] = (data['question']['userId']==user_id)
+    return jsonify(data)
+
+@app.route("/setanswer", methods=['POST'])
+@jwt_required
+def set_answer():
+    answer = request.json.get("answer")
+    answer['answer'] = process_string(answer['answer'])
+    if not answer['edit']:
+        post.delete_abandoned_post(answer['previous_post_id'])
+        answer['previous_post_id'] = "null"
+    post.replyToPost(answer)
+    data = post.get_post(answer['userId'], answer['questionId'])
+    data['question']['isUser'] = (data['question']['userId']==answer['userId'])
+    return jsonify(data)
+
+@app.route("/setthoughtfulness", methods=['POST'])
+@jwt_required
+def set_thoughtfulness():
+    t_post = request.json.get("post")
+    post.insert_training_data(t_post)
+    data = post.get_post(t_post['userId'], t_post['questionId'])
+    data['question']['isUser'] = (data['question']['userId']==t_post['userId'])
+    return jsonify(data)
 
 @app.route("/rank", methods=['POST'])
 @jwt_required
 def get_vehicle_ranks():
-    start_date = to_date(request.json.get('startDate'))
-    end_date = to_date(request.json.get('endDate'))
-
-    data = vehicle_score_service.get_rank(
-        start_date, end_date)
+    data = ocbc_service.get_rank()
 
     return jsonify(data)
 
-
-@app.route('/kpi', methods=['POST'])
+@app.route("/addtag", methods=['POST'])
 @jwt_required
-def get_kpi():
-    start_date = to_date(request.json.get('startDate'))
-    end_date = to_date(request.json.get('endDate'))
-    vehicle_list = request.json.get('vehicleList')
-    data = vehicle_score_service.get_kpis(start_date, end_date, vehicle_list)
+def add_tag():
+    t_post = request.json.get("post")
+    post.add_tag(t_post)
+    data = post.get_post(t_post['userId'], t_post['questionId'])
+    data['question']['isUser'] = (data['question']['userId']==t_post['userId'])
+    return jsonify(data)
+
+@app.route("/deletetag", methods=['POST'])
+@jwt_required
+def delete_tag():
+    t_post = request.json.get("post")
+    post.delete_tag(t_post)
+    data = post.get_post(t_post['userId'], t_post['questionId'])
+    data['question']['isUser'] = (data['question']['userId']==t_post['userId'])
+    return jsonify(data)
+
+@app.route("/getthoughtfulness", methods=['POST'])
+@jwt_required
+def get_thoughtfulness():
+    t_post = request.json.get("post")
+    if t_post['subject'] != None:
+        t_post['subject'] = process_string(t_post['subject'])
+    t_post['content'] = process_string(t_post['content'])
+    data = post.insert_abandoned_post(t_post)   
     return jsonify(data)
 
 
-@app.route('/stats', methods=['POST'])
+@app.route("/setusername", methods=['POST'])
 @jwt_required
-def get_stats():
-    start_date = to_date(request.json.get('startDate'))
-    end_date = to_date(request.json.get('endDate'))
-    vehicle_list = request.json.get('vehicleList')
-    # pdb.set_trace()
-    data = vehicle_score_service.get_stats(start_date, end_date, vehicle_list)
+def set_username():
+    user = request.json.get("user")
+    post.set_user_name(user)
+    user_info = post.get_user_by_id(user['userId'])
+    is_teacher = False
+    try:
+        int(user_info['email'][-4:])
+    except:
+        is_teacher = True
+    return jsonify( msg="Success", 
+                    is_teacher=is_teacher, 
+                    userId=user_info['avatar_id'],
+                    section_id=user_info['section_id'],
+                    email=user_info['email'],
+                    username=user_info['avatar_name'],
+                    agreed=True if user_info['agreed']=="1" else False)
+    
+@app.route("/get_topics", methods=['POST'])
+@jwt_required
+def get_topics():
+    return jsonify(post.get_topics())
+
+@app.route("/vote", methods=['POST'])
+@jwt_required
+def set_vote():
+    vote = request.json.get("vote")
+    post.set_vote(vote['post_id'], vote['avatar_id'], vote['vote'])
+    data = post.get_post(vote['avatar_id'], vote['questionId'])
+    data['question']['isUser'] = (data['question']['userId']==vote['avatar_id'])
     return jsonify(data)
 
-
-@app.route('/overview', methods=['POST'])
+@app.route("/get_sessions", methods=['POST'])
 @jwt_required
-def overview():
-    filter = {
-        'start_date': to_date(request.json.get('startDate')),
-        'end_date': to_date(request.json.get('endDate')),
-        'vehicle_list': request.json.get('vehicleList')
-    }
-    data = []
-    position_service.vehicle_position(filter, data)
-    return jsonify(data)
+def get_sessions():
+    avatar_id = request.json.get("avatar_id")
+    return jsonify(post.get_sessions(avatar_id))
 
-
-@app.route('/realtime', methods=['POST'])
+@app.route("/getnewts", methods=['POST'])
 @jwt_required
-def get_realtime_location():
-    vehicle_list = request.json.get('vehicleList')
-    data = []
-
-    for veh in baseride.get_vehicle('e62a48f233'):
-        if vehicle_list and veh['id'] not in vehicle_list:
-            continue
-        rec = {
-            'VehicleID': str(veh['id']),
-            'Lat': float(veh['position']['lat']),
-            'Lon': float(veh['position']['lon']),
-            'Speed': veh['position']['speed'],
-            'DeviceTS': veh['position']['device_ts']
-        }
-        data.append(rec)
-
-    return jsonify(data)
-
-
-@app.route('/historical', methods=['GET', 'POST'])
-@jwt_required
-def get_past_journeys():
-    filter = {
-        'start_date': to_date(request.json.get('startDate')),
-        'end_date': to_date(request.json.get('endDate')),
-        'vehicle_list': request.json.get('vehicleList')
-    }
-
-    data = {}
-    position_service.get_trips(filter, data)
-    return jsonify(data)
-
-@app.route('/vehicles', methods=['GET', 'POST'])
-@jwt_required
-def get_vehicles():
-    return jsonify(accessible_vehicles)
-
-# Retrieve the months during which a rebate is applicable
-@app.route('/month', methods=['GET', 'POST'])
-@jwt_required
-def get_months():
-    data = ["June 2017"]
-    return jsonify(data)
-
-@app.route('/monthly_discount', methods=['GET', 'POST'])
-@jwt_required
-def get_monthly_discount():
-    month = request.json.get('month')
-    if month == 'June 2017':
-        data = {
-            "claims": 1,
-            "mileage": 2487.02,
-            "score": 0.87,
-            "crossSell": 1,
-            "pilotProgram": 1,
-            "rebate": 437.5
-        }
-    elif month == 'July 2017': 
-        data = {
-            "claims": 0,
-            "mileage": 700,
-            "score": 0.88,
-            "crossSell": 1,
-            "pilotProgram": 1,
-            "rebate": 437.5
-        }
-    else:
-        data = {
-            "claims": 0,
-            "mileage": 700,
-            "score": 0.88,
-            "crossSell": 1,
-            "pilotProgram": 1,
-            "rebate": 437.5
-        }
-    return jsonify(data)
-
-@app.route('/score', methods=['GET', 'POST'])
-@jwt_required
-def get_scoring_stats():
-    month = request.json.get('month')
-    start_date, end_date = time_helper.convert_month(month)
-    data = {}
-    avg_score_list = vehicle_score_service.get_monthly_score(accessible_vehicles)
-    score_dist_list = vehicle_score_service.get_score_dist(start_date, end_date, accessible_vehicles)
-    data["scoreDistribution"] = score_dist_list
-    data["averageScore"] = avg_score_list
-    return jsonify(data)
-
-@app.route('/mileage', methods=['GET', 'POST'])
-@jwt_required
-def get_mileage_stats():
-    month = request.json.get('month')
-    start_date, end_date = time_helper.convert_month(month)
-    data = {}
-    avg_distance_list = vehicle_score_service.get_monthly_mileage(accessible_vehicles)
-    distance_dist_list = []
-    data["distanceDistribution"] = distance_dist_list
-    data["averageDistance"] = avg_distance_list
-    return jsonify(data)
-
-@app.route('/accident', methods=['GET', 'POST'])
-@jwt_required
-def get_accidents():
-    filter = {
-        'start_date': to_date(request.json.get('startDate')),
-        'end_date': to_date(request.json.get('endDate')),
-        'vehicle_list': request.json.get('vehicleList')
-    }
-    data = {}
-    coordinates = {}
-
-    vehicle = filter['vehicle_list'][0]
-    position_service.get_trips(filter, coordinates)
-    data["coordinates"] = coordinates.get(vehicle)
-    data["events"] = {
-        "Harsh Braking": [
-            {
-                "Lat": 1.371912490015,
-                "Long": 103.89906305231,
-                "DeviceTS": "2017-07-19 15:59:54",
-                "Speed": 1 
-            }
-        ],
-        "Harsh Acceleration": []
-    }
+def get_newts():
+    t_post = request.json.get("post")
+    if t_post['subject'] != None:
+        t_post['subject'] = process_string(t_post['subject'])
+    t_post['content'] = process_string(t_post['content'])
+    data = post.get_new_thoughtfulness(t_post)   
     return jsonify(data)

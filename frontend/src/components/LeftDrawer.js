@@ -1,6 +1,6 @@
 import React, { PropTypes } from "react";
 import Drawer from "material-ui/Drawer";
-import { white, amber700 } from "material-ui/styles/colors";
+import { white, amber700, cyan100 } from "material-ui/styles/colors";
 import { Link } from "react-router";
 import { List, ListItem } from "material-ui/List";
 
@@ -12,21 +12,21 @@ import Grade from "material-ui/svg-icons/action/grade";
 import Warning from "material-ui/svg-icons/alert/warning";
 import Fingerprint from "material-ui/svg-icons/action/fingerprint";
 import Redeem from "material-ui/svg-icons/action/redeem";
-
+import UserInfo from "./UserInfo";
+import store from "./../store";
+import {GetMyStats} from "./../actions/statAction";
+import { connect } from "react-redux";
 
 const styles = {
-	logo: {
-		padding: "15px 0 20px 15px",
-		backgroundImage: "url(" + require("../images/fleet_man.png") + ")",
-		height: 45,
-		backgroundSize: "100% 100%"
-	},
 	listItem: {
 		color: white,
 		fontSize: 14
 	},
 	listIcon:{
 		color:amber700
+	},
+	drawer: {
+		backgroundColor: white
 	}
 };
 
@@ -34,70 +34,47 @@ class LeftDrawer extends React.Component {
 	constructor() {
 		super();
 	}
-	makeMenu() {
-		return (
-			<List>
-				<ListItem
-					key={1}
-					primaryText="Overview"
-					style={styles.listItem}
-					leftIcon={<Assessment color={styles.listIcon.color} />}
-					containerElement={<Link to={"/home/dashboard"} />}
-				/>
-				<ListItem
-					key={2}
-					primaryText="Tracking"
-					style={styles.listItem}
-					leftIcon={<GpsFixed color={styles.listIcon.color}/>}
-					containerElement={<Link to={"/home/tracking"} />}
-				/>
-				<ListItem
-					key={3}
-					primaryText="Rankings"
-					style={styles.listItem}
-					leftIcon={<Grade color={styles.listIcon.color}/>}
-					containerElement={<Link to={"/home/rank"} />}
-				/>
-				<ListItem
-					key={4}
-					primaryText="Accidents"
-					style={styles.listItem}
-					leftIcon={<Warning color={styles.listIcon.color}/>}
-					containerElement={<Link to={"/home/accidents"} />}
-				/>
-				<ListItem
-					key={5}
-					primaryText="Accident Analysis"
-					style={styles.listItem}
-					leftIcon={<Fingerprint color={styles.listIcon.color}/>}
-					containerElement={<Link to={"/home/accidentanalysis"} />}
-				/>
-				<ListItem
-					key={6}
-					primaryText="Offer"
-					style={styles.listItem}
-					leftIcon={<Redeem color={styles.listIcon.color}/>}
-					containerElement={<Link to={"/home/offer"} />}
-				/>
-			</List>
-		);
+
+	componentDidMount(){
+		this.props.getMyStats(
+			sessionStorage.getItem("access_token"),
+			sessionStorage.getItem("userId"),
+			this.props.section_id?this.props.section_id:sessionStorage.getItem("default_section")
+		)	
 	}
 
 	render() {
-		let { navDrawerOpen } = this.props;
 		return (
-			<Drawer docked={true} open={navDrawerOpen}>
-				<div style={styles.logo} />
-				{this.makeMenu()}
+			<Drawer 
+			open={this.props.nav}
+			openSecondary={true}
+			containerStyle={styles.drawer}
+			width={300}
+			disableSwipeToOpen={true}>
+				<UserInfo
+					 stat={this.props.stat}
+					 rankings={this.props.rankings}
+				/>
 			</Drawer>
 		);
 	}
 }
 
-LeftDrawer.propTypes = {
-	navDrawerOpen: PropTypes.bool,
-	menus: PropTypes.array,
-	username: PropTypes.string
+const mapStateToProps = (state) => {
+  return {
+	  stat: state.stat.stat,
+	  rankings: state.stat.rankings,
+	  nav: state.nav.navOpen,
+	  section_id: state.login.user.section_id
+  };
 };
 
-export default LeftDrawer;
+const mapDispatchToProps = (dispatch) => {
+  return {
+	getMyStats: (access_token, userId, section_id) => {
+            dispatch(GetMyStats(access_token, userId, section_id))
+        }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(LeftDrawer);
