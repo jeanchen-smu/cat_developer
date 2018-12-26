@@ -31,7 +31,7 @@ export function ValidatePassword(password){
 export function GetLoginInfo(email){
     const loginObject = {
         method: "post",
-            url: "/api/login",
+            url: "/cat/api/login",
             headers: {
                 "Content-Type": "application/json"
             },
