@@ -4,7 +4,7 @@ import { browserHistory } from 'react-router';
 function SetPostReqObj(access_token, filter, post){
     return {
         method: "post",
-        url: "/api/setpost",
+        url: "/cat/api/setpost",
         headers:{
             "Content-Type": "application/json",
             Authorization: "Bearer " + access_token,        
@@ -23,7 +23,7 @@ export function SetPost(access_token, filter, post){
                 dispatch ({type: "SET_POSTS_SUCCEED", payload: response.data})
             })
             .then(() => {
-                browserHistory.push("/home/post");
+                browserHistory.push("/cat/home/post");
             })
             .catch(err => {
                 dispatch ({type: "SET_POSTS_FAIL", payload: err})
@@ -34,7 +34,7 @@ export function SetPost(access_token, filter, post){
 function GetQuestionReqObj(access_token, questionId, userId){
     return {
         method: "post",
-        url: "/api/question",
+        url: "/cat/api/question",
         headers:{
             "Content-Type": "application/json",
             Authorization: "Bearer " + access_token,       
