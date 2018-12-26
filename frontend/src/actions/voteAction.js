@@ -9,7 +9,7 @@ export function ErrorVoteClose(){
 function VoteClickReqObj(access_token, vote){
     return {
         method: "post",
-        url: "/api/vote",
+        url: "/cat/api/vote",
         headers:{
             "Content-Type": "application/json",
             Authorization: "Bearer " + access_token,       
